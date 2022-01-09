@@ -15,11 +15,14 @@ namespace GameSystem
         [SerializeField]
         private CoordinateConverter _coordinateConverter;
 
+        public static GameLoop gameLoop;
+
+        private Piece<Hex> _playerPiece;
         private MoveManager<Hex> _moveManager;
         private SelectionManager<Piece<Hex>> _selectionManager;
 
-        //[SerializeField]
-        //private int _currentPlayerID = 1;
+        [SerializeField]
+        private int _currentPlayerID = 1;
         [SerializeField]
         private float _hexSize = 2.0f;
         [SerializeField][Range(1, 20)]
@@ -31,6 +34,11 @@ namespace GameSystem
 
         public void Start()
         {
+            if (gameLoop == null)
+            {
+                gameLoop = this;
+            }
+
             var board = new Board<Piece<Hex>, Hex>();
             var grid = new HexGrid<Hex>(_gridSize);
 
@@ -38,13 +46,12 @@ namespace GameSystem
             ConnectPiece(board, grid);
             GetPlayerPiece(board, grid, out var playerPiece);
 
+            _playerPiece = playerPiece;
             _selectionManager = new SelectionManager<Piece<Hex>>();
             _moveManager = new MoveManager<Hex>(board, grid, _gridSize, playerPiece);
-
-            OnCardSelected(playerPiece);
         }
 
-        public void GenerateHexField(HexGrid<Hex> grid)
+        private void GenerateHexField(HexGrid<Hex> grid)
         {
             //for gridsize create a cubecoordinate for each hex.
             //put them in a list
@@ -98,7 +105,7 @@ namespace GameSystem
             var pieces = FindObjectsOfType<PieceView>();
             foreach (PieceView piece in pieces)
             {
-                if (piece.PlayerID == 1)
+                if (piece.PlayerID == _currentPlayerID)
                 {
                     _playerPos = piece.transform.position;
                 }
@@ -133,63 +140,24 @@ namespace GameSystem
             hex = hexObject.GetComponentInChildren<Hex>();
         }
 
-        //-----------------------------------------------------------------------------------
-        //Needs to be converted to selection for cards, not pieces.
+        public void CardSelected(CardType cardType)
+            => OnCardSelected(_playerPiece, cardType);
+        public void CardDeSelected(CardType cardType)
+            => OnCardDeselected(_playerPiece, cardType);
 
-        //private void Select(Piece<Hex> piece, Board<Piece<Hex>, Hex> board)
-        //{
-        //    if (piece.PlayerID == _currentPlayerID)
-        //    {
-        //        _selectionManager.DeselectAll();
-        //        _selectionManager.Select(piece);
-        //    }
-        //    else
-        //    {
-        //        if (board.TryGetPosition(piece, out var tile))
-        //        {
-        //            Select(tile, board);
-        //        }
-        //    }
-        //}
-
-        //private void Select(Hex hex, Board<Piece<Hex>, Hex> board)
-        //{
-        //    if (board.TryGetPiece(hex, out var piece) && piece.PlayerID == _currentPlayerID)
-        //    {
-        //        Select(piece, board);
-        //    }
-        //    else
-        //    {
-        //        if (_selectionManager.HasSelection)
-        //        {
-        //            var selectedPiece = _selectionManager.SelectedItem;
-        //            _selectionManager.Deselect(selectedPiece);
-
-        //            var validPositions = _moveManager.ValidPositionsFor(selectedPiece);
-
-        //            if (validPositions.Contains(hex))
-        //            {
-        //                //_selectionManager.DeselectAll();
-        //                _moveManager.Move(selectedPiece, hex);
-        //            }
-        //        }
-        //    }
-        //}
-
-        private void OnCardSelected(Piece<Hex> piece)
+        private void OnCardSelected(Piece<Hex> piece, CardType cardtype)
         {
             //e.SelectionItem.Activate = true;
-            var hexes = _moveManager.ValidPositionsFor(piece);
+            var hexes = _moveManager.ValidPositionsFor(piece, cardtype);
             foreach (var hex in hexes)
                 hex.Highlight = true;
         }
-
-        //private void OnPieceDeselected(object source, SelectionEventArgs<Piece<Hex>> eventArgs)
-        //{
-        //    //e.SelectionItem.Activate = false;
-        //    var hexes = _moveManager.ValidPositionsFor(eventArgs.SelectionItem);
-        //    foreach (var hex in hexes)
-        //        hex.Highlight = false;
-        //}
+        private void OnCardDeselected(Piece<Hex> piece, CardType cardtype)
+        {
+            //e.SelectionItem.Activate = false;
+            var tiles = _moveManager.ValidPositionsFor(piece, cardtype);
+            foreach (var tile in tiles)
+                tile.Highlight = false;
+        }
     }
 }

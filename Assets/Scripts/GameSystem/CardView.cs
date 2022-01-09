@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using CardSystem;
+using System;
 
-namespace CardSystem
+namespace GameSystem
 {
-    public class CardVisual : MonoBehaviour, IDragHandler, IDropHandler
+    public class CardView : MonoBehaviour, IDragHandler, IDropHandler
     {
         [SerializeField]
         private CardType _cardType;
         [SerializeField]
         private Vector3 _offsetFromMouse = new Vector3(0, -100, 0);
-
-        public CardType cardType => _cardType;
 
         private Vector3 _startPosition;
 
@@ -24,15 +24,16 @@ namespace CardSystem
 
         public void OnDrag(PointerEventData eventData)
         {
+            GameLoop.gameLoop.CardSelected(_cardType);
             this.transform.position = Input.mousePosition + _offsetFromMouse;
             //this.gameObject.GetComponent<Image>().raycastTarget = false;
         }
 
         public void OnDrop(PointerEventData eventData)
         {
+            GameLoop.gameLoop.CardDeSelected(_cardType);
             this.transform.position = _startPosition;
             //this.gameObject.GetComponent<Image>().raycastTarget = true;
         }
     }
-
 }

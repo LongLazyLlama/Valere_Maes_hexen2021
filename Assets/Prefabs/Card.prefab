@@ -85,8 +85,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 1281289462802851812}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3502ce3b592a0c48b22192f1fbe78e2, type: 3}
+  m_Script: {fileID: 11500000, guid: 3d9c1e53e4d449c4fbd47abfd4dfbf20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cardType: 3
+  _cardType: 0
   _offsetFromMouse: {x: 0, y: -100, z: 0}

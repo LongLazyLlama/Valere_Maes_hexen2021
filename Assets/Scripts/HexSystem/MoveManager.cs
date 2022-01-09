@@ -28,7 +28,7 @@ namespace HexSystem
             _hexgrid = grid;
             _maxSteps = gridSize * 2;
 
-            //subscribes to the board events.
+            //subscribes to the piece events.
             _board.PieceMoved += (s, e) => e.Piece.MoveTo(e.ToPosition);
             _board.PiecePlaced += (s, e) => e.Piece.PlaceAt(e.AtPosition);
             _board.PieceTaken += (s, e) => e.Piece.TakeFrom(e.FromPosition);
@@ -62,11 +62,22 @@ namespace HexSystem
                         .NorthWest(1)
                         .CollectValidPositions()));
 
+            _moves.Add(CardType.Pushback,
+                new ConfigurableMove<TPosition>(board, grid, (b, h, p)
+                => new PositionHelper<TPosition>(b, h, p)
+                        .NorthEast(1)
+                        .East(1)
+                        .SouthEast(1)
+                        .SouthWest(1)
+                        .West(1)
+                        .NorthWest(1)
+                        .CollectValidPositions()));
+
             Debug.Log($"Moveset dictionary now contains {_moves.Count} movesets.");
 
             if (_moves.TryGetValue(CardType.Swipe, out var moves))
             {
-                var movecount = ValidPositionsFor(playerPiece).Count;
+                var movecount = ValidPositionsFor(playerPiece, CardType.Swipe).Count;
 
                 Debug.Log($"Swipe moveset now contains {movecount} moves.");
             }
@@ -76,9 +87,9 @@ namespace HexSystem
         }
 
         //Returns a list of valid positions for a Card.
-        public List<TPosition> ValidPositionsFor(Piece<TPosition> piece)
+        public List<TPosition> ValidPositionsFor(Piece<TPosition> piece, CardType cardType)
         {
-            var result = _moves[CardType.Swipe]
+            var result = _moves[cardType]
                         .Where((m) => m.CanExecute(piece))
                         .SelectMany((m) => m.Positions(piece))
                         .ToList();
@@ -86,10 +97,10 @@ namespace HexSystem
             return result;
         }
 
-        public void Move(Piece<TPosition> piece, TPosition position)
+        public void Move(Piece<TPosition> piece, TPosition position, CardType cardType)
         {
             //neemt alle mogelijke moves.
-            var move = _moves[CardType.Swipe]
+            var move = _moves[cardType]
                 .Where(m => m.CanExecute(piece))
                 .Where(m => m.Positions(piece).Contains(position))
                 .First();
