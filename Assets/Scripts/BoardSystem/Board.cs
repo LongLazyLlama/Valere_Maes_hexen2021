@@ -78,7 +78,7 @@ namespace BoardSystem
             //Adds the piece with its position to the dictionary.
             _pieces.Add(piece, position);
 
-            //Debug.Log($"Piece placed on hex.");
+            //Debug.Log($"Pieces registered in dictionary: {_pieces.Count}");
 
             //saves the placement in eventargs for the replaymanager.
             OnPiecePlaced(new PiecePlacedEventArgs<TPiece, TPosition>(piece, position));

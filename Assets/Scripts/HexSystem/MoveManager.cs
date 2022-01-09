@@ -12,18 +12,21 @@ namespace HexSystem
     public class MoveManager<TPosition>
         where TPosition : IPosition
     {
+        private int _maxSteps;
+
         //Stores Movesets (a card type with its possible moves)
         private MultiValueDictionary<CardType, IMove<TPosition>> _moves = 
             new MultiValueDictionary<CardType, IMove<TPosition>>();
 
         private Board<Piece<TPosition>, TPosition> _board;
         private HexGrid<TPosition> _hexgrid;
-        private Piece<TPosition> _piece;
 
-        public MoveManager(Board<Piece<TPosition>, TPosition> board, HexGrid<TPosition> grid, Piece<TPosition> playerPiece)
+        public MoveManager(Board<Piece<TPosition>, TPosition> board, HexGrid<TPosition> grid,
+            int gridSize, Piece<TPosition> playerPiece)
         {
             _board = board;
             _hexgrid = grid;
+            _maxSteps = gridSize * 2;
 
             //subscribes to the board events.
             _board.PieceMoved += (s, e) => e.Piece.MoveTo(e.ToPosition);
@@ -34,12 +37,12 @@ namespace HexSystem
             _moves.Add(CardType.Swipe,
                 new ConfigurableMove<TPosition>(board, grid, (b, h, p) 
                 => new PositionHelper<TPosition>(b, h, p)
-                        .NorthEast()
-                        .East()
-                        .SouthEast()
-                        .SouthWest()
-                        .West()
-                        .NorthWest()
+                        .NorthEast(_maxSteps)
+                        .East(_maxSteps)
+                        .SouthEast(_maxSteps)
+                        .SouthWest(_maxSteps)
+                        .West(_maxSteps)
+                        .NorthWest(_maxSteps)
                         .CollectValidPositions()));
 
             _moves.Add(CardType.Teleport,
@@ -63,18 +66,16 @@ namespace HexSystem
 
             if (_moves.TryGetValue(CardType.Swipe, out var moves))
             {
-                var player = GameObject.FindGameObjectWithTag("Player");
-                var movecount = ValidPositionsFor(_piece);
+                var movecount = ValidPositionsFor(playerPiece).Count;
 
                 Debug.Log($"Swipe moveset now contains {movecount} moves.");
-
             }
 
             //_moves.Add(PieceType.Pawn, new PawnMove(board, grid));
             //_moves.Add(PieceType.Pawn, new PawnDoubleMove());
         }
 
-        ////Returns a list of valid positions for a PIECE.
+        //Returns a list of valid positions for a Card.
         public List<TPosition> ValidPositionsFor(Piece<TPosition> piece)
         {
             var result = _moves[CardType.Swipe]
@@ -85,20 +86,18 @@ namespace HexSystem
             return result;
         }
 
-        //---------------------------------------------------------------------------------------------------------
+        public void Move(Piece<TPosition> piece, TPosition position)
+        {
+            //neemt alle mogelijke moves.
+            var move = _moves[CardType.Swipe]
+                .Where(m => m.CanExecute(piece))
+                .Where(m => m.Positions(piece).Contains(position))
+                .First();
 
-        //public void Move(Piece<TPosition> piece, TPosition position)
-        //{
-        //    //neemt alle mogelijke moves.
-        //    var move = _moves[piece.PieceType]
-        //        .Where(m => m.CanExecute(piece))
-        //        .Where(m => m.Positions(piece).Contains(position))
-        //        .First();
-
-        //    move.Execute(piece, position);
-        //    //get first moves
-        //    //of which position is part of validmoves.
-        //    //execute.
-        //}
+            move.Execute(piece, position);
+            //get first moves
+            //of which position is part of validmoves.
+            //execute.
+        }
     }
 }

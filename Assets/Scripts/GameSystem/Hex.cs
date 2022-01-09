@@ -19,10 +19,8 @@ namespace GameSystem
         }
     }
 
-    public class Hex : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IPosition
+    public class Hex : MonoBehaviour, IPointerClickHandler, IDropHandler, IPosition
     {
-        //public event EventHandler<HexEventArgs> Clicked;
-
         [SerializeField]
         private UnityEvent OnActivate;
         [SerializeField]
@@ -39,19 +37,14 @@ namespace GameSystem
             }
         }
 
+        public void OnDrop(PointerEventData eventData)
+        {
+            throw new NotImplementedException();
+        }
+
         public void OnPointerClick(PointerEventData eventData)
         {
-            OnDeactivate.Invoke();
-        }
-
-        public void OnPointerEnter(PointerEventData eventData)
-        {
-            OnActivate.Invoke();
-        }
-
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            OnDeactivate.Invoke();
+            
         }
 
         //------------------------------------------------------------------------------------------------------

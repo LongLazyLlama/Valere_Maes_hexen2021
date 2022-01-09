@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using HexSystem;
 using BoardSystem;
+using CardSystem;
+using System;
 
 namespace GameSystem
 {
@@ -13,13 +15,19 @@ namespace GameSystem
         [SerializeField]
         private CoordinateConverter _coordinateConverter;
 
+        private MoveManager<Hex> _moveManager;
+        private SelectionManager<Piece<Hex>> _selectionManager;
+
+        //[SerializeField]
+        //private int _currentPlayerID = 1;
         [SerializeField]
         private float _hexSize = 2.0f;
         [SerializeField][Range(1, 20)]
         private int _gridSize = 3;
 
+        private Vector3 _playerPos;
+
         private List<Vector3> HexGridData = new List<Vector3>();
-        private MoveManager<Hex> _moveManager;
 
         public void Start()
         {
@@ -28,8 +36,12 @@ namespace GameSystem
 
             GenerateHexField(grid);
             ConnectPiece(board, grid);
+            GetPlayerPiece(board, grid, out var playerPiece);
 
-            //_moveManager = new MoveManager<Hex>(board, grid);
+            _selectionManager = new SelectionManager<Piece<Hex>>();
+            _moveManager = new MoveManager<Hex>(board, grid, _gridSize, playerPiece);
+
+            OnCardSelected(playerPiece);
         }
 
         public void GenerateHexField(HexGrid<Hex> grid)
@@ -69,16 +81,41 @@ namespace GameSystem
                 piece.PlayerID = pieceView.PlayerID;
                 pieceView.Model = piece;
 
-                var (v, a, l) = _coordinateConverter.CartesianCoordinatesToCube(pieceView.transform.localPosition, _hexSize);
+                var (v, a, l) = _coordinateConverter.CartesianCoordinatesToCube(pieceView.transform.position, _hexSize);
 
                 //Place the pawn on the tile (adds the piece with the hex to the dictionairy).
                 if (grid.TryGetPositionAt(v, a, l, out Hex hex))
                 {
                     board.Place(piece, hex);
                 }
+            }
+        }
 
-                //Subscribes the pieceview to select so it can be selected.
-                pieceView.Clicked += (s, e) => Select(e.Piece);
+        private void GetPlayerPiece(Board<Piece<Hex>, Hex> board, HexGrid<Hex> grid, out Piece<Hex> playerPiece)
+        {
+            //var playerPos = GameObject.FindGameObjectWithTag("Player").transform.position;
+
+            var pieces = FindObjectsOfType<PieceView>();
+            foreach (PieceView piece in pieces)
+            {
+                if (piece.PlayerID == 1)
+                {
+                    _playerPos = piece.transform.position;
+                }
+            }
+
+            var playerCubePos = _coordinateConverter.CartesianCoordinatesToCube(_playerPos, _hexSize);
+
+            if (grid.TryGetPositionAt(playerCubePos.v, playerCubePos.a, playerCubePos.l, out Hex hex))
+            {
+                board.TryGetPiece(hex, out var piece);
+                playerPiece = piece;
+
+                Debug.Log($"Selected piece player ID: {piece.PlayerID} on worldposition {_playerPos} and cubecoordinate {playerCubePos}");
+            }
+            else
+            {
+                playerPiece = null;
             }
         }
 
@@ -96,15 +133,63 @@ namespace GameSystem
             hex = hexObject.GetComponentInChildren<Hex>();
         }
 
-        private void Select(Piece<Hex> piece)
-            => _gameStateMachine.CurrentState.Select(piece);
-        private void Select(Hex hex)
-            => _gameStateMachine.CurrentState.Select(hex);
+        //-----------------------------------------------------------------------------------
+        //Needs to be converted to selection for cards, not pieces.
 
+        //private void Select(Piece<Hex> piece, Board<Piece<Hex>, Hex> board)
+        //{
+        //    if (piece.PlayerID == _currentPlayerID)
+        //    {
+        //        _selectionManager.DeselectAll();
+        //        _selectionManager.Select(piece);
+        //    }
+        //    else
+        //    {
+        //        if (board.TryGetPosition(piece, out var tile))
+        //        {
+        //            Select(tile, board);
+        //        }
+        //    }
+        //}
 
-        //private void Select(Piece<Tile> piece)
-        //    => _gameStateMachine.CurrentState.Select(piece);
-        //private void Select(Tile tile)
-        //    => _gameStateMachine.CurrentState.Select(tile);
+        //private void Select(Hex hex, Board<Piece<Hex>, Hex> board)
+        //{
+        //    if (board.TryGetPiece(hex, out var piece) && piece.PlayerID == _currentPlayerID)
+        //    {
+        //        Select(piece, board);
+        //    }
+        //    else
+        //    {
+        //        if (_selectionManager.HasSelection)
+        //        {
+        //            var selectedPiece = _selectionManager.SelectedItem;
+        //            _selectionManager.Deselect(selectedPiece);
+
+        //            var validPositions = _moveManager.ValidPositionsFor(selectedPiece);
+
+        //            if (validPositions.Contains(hex))
+        //            {
+        //                //_selectionManager.DeselectAll();
+        //                _moveManager.Move(selectedPiece, hex);
+        //            }
+        //        }
+        //    }
+        //}
+
+        private void OnCardSelected(Piece<Hex> piece)
+        {
+            //e.SelectionItem.Activate = true;
+            var hexes = _moveManager.ValidPositionsFor(piece);
+            foreach (var hex in hexes)
+                hex.Highlight = true;
+        }
+
+        //private void OnPieceDeselected(object source, SelectionEventArgs<Piece<Hex>> eventArgs)
+        //{
+        //    //e.SelectionItem.Activate = false;
+        //    var hexes = _moveManager.ValidPositionsFor(eventArgs.SelectionItem);
+        //    foreach (var hex in hexes)
+        //        hex.Highlight = false;
+        //}
     }
 }

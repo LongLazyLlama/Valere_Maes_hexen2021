@@ -80,30 +80,44 @@ namespace HexSystem
             while (steps < maxSteps && nextPosition != null && validators.All((v) 
                 => v(_board, _hexGrid, _piece, nextPosition)))
             {
-                if (_board.TryGetPiece(nextPosition, out var nextPiece))
-                {
-                    if (nextPiece.PlayerID != _piece.PlayerID)
-                        _validPositions.Add(nextPosition);
+                _validPositions.Add(nextPosition);
 
-                    break;
-                }
-                else
-                {
-                    _validPositions.Add(nextPosition);
+                nextCoordinateV += vOffset;
+                nextCoordinateA += aOffset;
+                nextCoordinateL += lOffset;
 
-                    nextCoordinateV += vOffset;
-                    nextCoordinateA += aOffset;
-                    nextCoordinateL += lOffset;
+                _hexGrid.TryGetPositionAt(
+                    nextCoordinateV,
+                    nextCoordinateA,
+                    nextCoordinateL,
+                    out nextPosition);
 
-                    _hexGrid.TryGetPositionAt(
-                        currentCoordinates.v + vOffset,
-                        currentCoordinates.a + aOffset,
-                        currentCoordinates.l + lOffset,
-                        out nextPosition);
+                steps++;
 
-                    //nextPiece = _board.PieceAt(nextTile);
-                    steps++;
-                }
+                ////If there is a piece on that tile.
+                //if (_board.TryGetPiece(nextPosition, out var nextPiece))
+                //{
+                //    if (nextPiece.PlayerID != _piece.PlayerID)
+                //        _validPositions.Add(nextPosition);
+
+                //    steps++;
+                //}
+                //else
+                //{
+                //    _validPositions.Add(nextPosition);
+
+                //    nextCoordinateV += vOffset;
+                //    nextCoordinateA += aOffset;
+                //    nextCoordinateL += lOffset;
+
+                //    _hexGrid.TryGetPositionAt(
+                //        nextCoordinateV,
+                //        nextCoordinateA,
+                //        nextCoordinateL,
+                //        out nextPosition);
+
+                //    steps++;
+                //}
             }
 
             return this;
