@@ -1,7 +1,10 @@
 {
-    "name": "HexField",
+    "name": "HexSystem",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "GUID:6507a38f5cb2d214d99e62856d776f7a",
+        "GUID:57335c41cea7c414290005de245b92e4"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

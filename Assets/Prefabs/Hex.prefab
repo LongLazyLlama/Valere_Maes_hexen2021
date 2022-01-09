@@ -123,7 +123,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2058772070208170320}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8743effb72ba48f40b4e289233a58556, type: 3}
+  m_Script: {fileID: 11500000, guid: 50793c3dc61b1e44cae5412cd0d1be3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   OnActivate:
@@ -139,7 +139,7 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
   OnDeactivate:
     m_PersistentCalls:
@@ -156,9 +156,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  _positionHelper: {fileID: 11400000, guid: 0277bcc5e144c7a4f8c51098e3bb3147, type: 2}
-  CubeCoordinate: {x: 0, y: 0, z: 0}
-  CartesianCoordinate: {x: 0, y: 0, z: 0}
 --- !u!64 &2073859882962654857
 MeshCollider:
   m_ObjectHideFlags: 0

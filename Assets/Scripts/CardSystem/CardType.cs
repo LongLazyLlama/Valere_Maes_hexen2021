@@ -8,9 +8,9 @@ namespace CardSystem
 {
     public enum CardType
     {
-        swipe,
-        teleport,
-        slash,
-        pushback
+        Swipe,
+        Teleport,
+        Slash,
+        Pushback
     }
 }
