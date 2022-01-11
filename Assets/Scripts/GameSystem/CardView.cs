@@ -44,14 +44,14 @@ namespace GameSystem
         {
             if (CardUsed)
             {
-                GameLoop.gameLoop.CardDeSelected(CardType);
+                GameLoop.gameLoop.DeselectValidPositions(CardType);
                 _canvasGroup.blocksRaycasts = true;
 
                 Destroy(this.gameObject);
             }
             else
             {
-                GameLoop.gameLoop.CardDeSelected(CardType);
+                GameLoop.gameLoop.DeselectValidPositions(CardType);
                 this.transform.position = _startPosition;
 
                 _canvasGroup.blocksRaycasts = true;

@@ -14,9 +14,13 @@ namespace HexSystem
         private Piece<TPosition> _piece;
 
         private List<TPosition> _validPositions = new List<TPosition>();
+        private List<TPosition> _isolatedPositions = new List<TPosition>();
+
+        private bool _isolatedDirection;
 
         //First constructor takes the base info needed to operate the movementhelper.
-        public PositionHelper(Board<Piece<TPosition>, TPosition> board, HexGrid<TPosition> hexGrid, Piece<TPosition> piece)
+        public PositionHelper(Board<Piece<TPosition>, TPosition> board, HexGrid<TPosition> hexGrid, 
+            Piece<TPosition> piece)
         {
             _board = board;
             _hexGrid = hexGrid;
@@ -33,18 +37,24 @@ namespace HexSystem
 
         //Second constructor (one of these directions) checks if the info from the first constructor is present
         //and adds the direction with a maximum range.
-        public PositionHelper<TPosition> NorthEast(int maxRange = int.MaxValue, params Validator[] validators)
-           => Collect(1, -1, 0, maxRange, validators);
-        public PositionHelper<TPosition> East(int maxRange = int.MaxValue, params Validator[] validators)
-           => Collect(1, 0, -1, maxRange, validators);
-        public PositionHelper<TPosition> SouthEast(int maxRange = int.MaxValue, params Validator[] validators)
-           => Collect(0, 1, -1, maxRange, validators);
-        public PositionHelper<TPosition> SouthWest(int maxRange = int.MaxValue, params Validator[] validators)
-           => Collect(-1, 1, 0, maxRange, validators);
-        public PositionHelper<TPosition> West(int maxRange = int.MaxValue, params Validator[] validators)
-           => Collect(-1, 0, 1, maxRange, validators);
-        public PositionHelper<TPosition> NorthWest(int maxRange = int.MaxValue, params Validator[] validators)
-           => Collect(0, -1, 1, maxRange, validators);
+        public PositionHelper<TPosition> NorthEast(int maxRange = int.MaxValue, 
+            bool isolatedSelection = false, TPosition hex = default, params Validator[] validators)
+           => Collect(1, -1, 0, isolatedSelection, hex, maxRange, validators);
+        public PositionHelper<TPosition> East(int maxRange = int.MaxValue, 
+            bool isolatedSelection = false, TPosition hex = default, params Validator[] validators)
+           => Collect(1, 0, -1, isolatedSelection, hex, maxRange, validators);
+        public PositionHelper<TPosition> SouthEast(int maxRange = int.MaxValue, 
+            bool isolatedSelection = false, TPosition hex = default, params Validator[] validators)
+           => Collect(0, 1, -1, isolatedSelection, hex, maxRange, validators);
+        public PositionHelper<TPosition> SouthWest(int maxRange = int.MaxValue, 
+            bool isolatedSelection = false, TPosition hex = default, params Validator[] validators)
+           => Collect(-1, 1, 0, isolatedSelection, hex, maxRange, validators);
+        public PositionHelper<TPosition> West(int maxRange = int.MaxValue, 
+            bool isolatedSelection = false, TPosition hex = default, params Validator[] validators)
+           => Collect(-1, 0, 1, isolatedSelection, hex, maxRange, validators);
+        public PositionHelper<TPosition> NorthWest(int maxRange = int.MaxValue, 
+            bool isolatedSelection = false, TPosition hex = default, params Validator[] validators)
+           => Collect(0, -1, 1, isolatedSelection, hex, maxRange, validators);
 
         //Targets any piece on the board at any distance. (forbidden move)
         public PositionHelper<TPosition> AnyPiece(params Validator[] validators) 
@@ -78,8 +88,8 @@ namespace HexSystem
         }
 
         //Third constructor collects all positions for the selected pawn.
-        public PositionHelper<TPosition> Collect(int vOffset, int aOffset, int lOffset,
-            int maxSteps = int.MaxValue, params Validator[] validators)
+        public PositionHelper<TPosition> Collect(int vOffset, int aOffset, int lOffset, bool isolatedSelection, 
+            TPosition mouseHexPos, int maxSteps = int.MaxValue, params Validator[] validators)
         {
             //Gets the position of the selected pawn.
             if (!_board.TryGetPosition(_piece, out var currentPosition))
@@ -105,7 +115,33 @@ namespace HexSystem
             while (steps < maxSteps && nextPosition != null && validators.All((v) 
                 => v(_board, _hexGrid, _piece, nextPosition)))
             {
-                _validPositions.Add(nextPosition);
+                //Is it trying to collect the isolated positions or all valid positions.
+                if (isolatedSelection)
+                {
+                    _hexGrid.TryGetCubeCoordinateAt(nextPosition, out var pp);
+                    _hexGrid.TryGetCubeCoordinateAt(mouseHexPos, out var mp);
+
+                    if (pp == mp && !_isolatedDirection)
+                    {
+                        //Set all values back to default.
+                        steps = 0;
+                        nextCoordinateV = currentCoordinates.v + vOffset;
+                        nextCoordinateA = currentCoordinates.a + aOffset;
+                        nextCoordinateL = currentCoordinates.l + lOffset;
+
+                        //The hex with the mousepointer ontop is in this direction.
+                        _isolatedDirection = true;
+                    }
+
+                    if (_isolatedDirection)
+                    {
+                        _isolatedPositions.Add(nextPosition);
+                    }
+                }
+                else
+                {
+                    _validPositions.Add(nextPosition);
+                }
 
                 nextCoordinateV += vOffset;
                 nextCoordinateA += aOffset;
@@ -145,28 +181,31 @@ namespace HexSystem
                 //}
             }
 
+            _isolatedDirection = false;
             return this;
         }
 
-        public PositionHelper<TPosition> CollectIsolatedPositions(int vOffset, int aOffset, int lOffset,
-            int maxSteps = int.MaxValue, params Validator[] validators)
+        public List<TPosition> CollectIsolatedPositions(List<TPosition> validPositions, int maxSteps, TPosition hex)
         {
+            NorthEast(maxSteps, true, hex);
+            East(maxSteps, true, hex);
+            SouthEast(maxSteps, true, hex);
+            SouthWest(maxSteps, true, hex);
+            West(maxSteps, true, hex);
+            NorthWest(maxSteps, true, hex);
 
-
-            return this;
+            return _isolatedPositions;
         }
-
-
         public List<TPosition> CollectValidPositions()
         {
             return _validPositions;
         }
 
+
         public delegate bool Validator(Board<Piece<TPosition>, TPosition> board, HexGrid<TPosition> grid, Piece<TPosition> piece, TPosition toPosition);
 
         public static bool Empty(Board<Piece<TPosition>, TPosition> board, HexGrid<TPosition> hexGrid, Piece<TPosition> piece, TPosition toPosition)
             => !board.TryGetPiece(toPosition, out var _);
-
         public static bool ContainsEnemy(Board<Piece<TPosition>, TPosition> board, HexGrid<TPosition> hexGrid, Piece<TPosition> piece, TPosition toPosition)
             => board.TryGetPiece(toPosition, out var toPiece) && toPiece.PlayerID != piece.PlayerID;
 

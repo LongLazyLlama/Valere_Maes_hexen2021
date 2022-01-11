@@ -19,7 +19,7 @@ namespace GameSystem
         }
     }
 
-    public class Hex : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPosition
+    public class Hex : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler, IPosition
     {
         [SerializeField]
         private UnityEvent OnActivate;
@@ -55,31 +55,42 @@ namespace GameSystem
                 //Debug.Log("Dropped on highlighted hex.");
 
                 GameObject droppedCard = eventData.pointerDrag;
-
                 droppedCard.TryGetComponent<CardView>(out CardView cardView);
+
+                GameLoop.gameLoop.DeselectIsolated(cardView.CardType, this);
+
                 cardView.CardUsed = true;
             }
         }
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (!_isHighlighted)
+            GameObject card = eventData.pointerDrag;
+
+            if (!_isHighlighted && card != null)
             {
-                GameObject card = eventData.pointerDrag;
-
                 card.TryGetComponent<CardView>(out CardView cardView);
-                GameLoop.gameLoop.CardSelected(cardView.CardType);
+                GameLoop.gameLoop.SelectValidPositions(cardView.CardType);
 
-                Debug.Log("on hex");
+                //Debug.Log("on hex");
             }
-            else
+            else if (card != null)
             {
-                GameObject card = eventData.pointerDrag;
-
                 card.TryGetComponent<CardView>(out CardView cardView);
-                GameLoop.gameLoop.CardOverHighlightHex(cardView.CardType);
+                GameLoop.gameLoop.SelectIsolated(cardView.CardType, this);
 
-                Debug.Log("on highlighted hex");
+                //Debug.Log("on highlighted hex");
+            }
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            GameObject card = eventData.pointerDrag;
+
+            if (_isHighlighted && card != null)
+            {
+                card.TryGetComponent<CardView>(out CardView cardView);
+                GameLoop.gameLoop.DeselectIsolated(cardView.CardType, this);
             }
         }
     }

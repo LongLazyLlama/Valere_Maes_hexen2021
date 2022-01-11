@@ -97,13 +97,15 @@ namespace HexSystem
             return result;
         }
 
-        public List<TPosition> IsolatedPositionsFor(Piece<TPosition> piece, CardType cardType)
+        public List<TPosition> IsolatedPositionsFor(Piece<TPosition> piece, CardType cardType, TPosition hex)
         {
             //Take all previously highlighted hexes.
             var validHexes = ValidPositionsFor(piece, cardType);
 
             //Find all hexes in the direction of the card in comparison to the player.
-            var isolatedHexes = validHexes;
+            var isolatedHexes =
+                new PositionHelper<TPosition>(_board, _hexgrid, piece)
+                .CollectIsolatedPositions(validHexes, _maxSteps, hex);
 
             return isolatedHexes;
         }

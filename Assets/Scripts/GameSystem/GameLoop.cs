@@ -140,36 +140,46 @@ namespace GameSystem
             hex = hexObject.GetComponentInChildren<Hex>();
         }
 
-        public void CardSelected(CardType cardType)
-            => OnCardSelected(_playerPiece, cardType);
-        public void CardOverHighlightHex(CardType cardType)
-            => OnCardOverHighlightHex(_playerPiece, cardType);
-        public void CardDeSelected(CardType cardType)
-            => OnCardDeselected(_playerPiece, cardType);
+        public void SelectValidPositions(CardType cardType)
+            => SelectValidPositions(_playerPiece, cardType);
+        public void SelectIsolated(CardType cardType, Hex hex)
+            => SelectIsolated(_playerPiece, cardType, hex);
+        public void DeselectIsolated(CardType cardType, Hex hex)
+            => DeselectIsolated(_playerPiece, cardType, hex);
+        public void DeselectValidPositions(CardType cardType)
+            => DeselectValidPositions(_playerPiece, cardType);
 
-        private void OnCardSelected(Piece<Hex> piece, CardType cardtype)
+        private void SelectValidPositions(Piece<Hex> piece, CardType cardtype)
         {
             var hexes = _moveManager.ValidPositionsFor(piece, cardtype);
             foreach (var hex in hexes)
                 hex.Highlight = true;
         }
 
-        private void OnCardOverHighlightHex(Piece<Hex> piece, CardType cardtype)
+        private void SelectIsolated(Piece<Hex> piece, CardType cardtype, Hex hex)
         {
             //Deselect all highlighted tiles
-            CardDeSelected(cardtype);
+            DeselectValidPositions(cardtype);
 
             //Reselect all isolated tiles.
-            var hexes = _moveManager.IsolatedPositionsFor(piece, cardtype);
-            foreach (var hex in hexes)
-                hex.Highlight = true;
+            var hexes = _moveManager.IsolatedPositionsFor(piece, cardtype, hex);
+            foreach (var h in hexes)
+                h.Highlight = true;
         }
 
-        private void OnCardDeselected(Piece<Hex> piece, CardType cardtype)
+        private void DeselectIsolated(Piece<Hex> piece, CardType cardtype, Hex hex)
         {
-            var tiles = _moveManager.ValidPositionsFor(piece, cardtype);
-            foreach (var tile in tiles)
-                tile.Highlight = false;
+            //Reselect all isolated tiles.
+            var hexes = _moveManager.IsolatedPositionsFor(piece, cardtype, hex);
+            foreach (var h in hexes)
+                h.Highlight = false;
+        }
+
+        private void DeselectValidPositions(Piece<Hex> piece, CardType cardtype)
+        {
+            var hexes = _moveManager.ValidPositionsFor(piece, cardtype);
+            foreach (var hex in hexes)
+                hex.Highlight = false;
         }
     }
 }
