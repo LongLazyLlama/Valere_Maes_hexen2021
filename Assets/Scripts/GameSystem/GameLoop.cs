@@ -142,12 +142,13 @@ namespace GameSystem
 
         public void SelectValidPositions(CardType cardType)
             => SelectValidPositions(_playerPiece, cardType);
+        public void DeselectValidPositions(CardType cardType)
+            => DeselectValidPositions(_playerPiece, cardType);
+
         public void SelectIsolated(CardType cardType, Hex hex)
             => SelectIsolated(_playerPiece, cardType, hex);
         public void DeselectIsolated(CardType cardType, Hex hex)
             => DeselectIsolated(_playerPiece, cardType, hex);
-        public void DeselectValidPositions(CardType cardType)
-            => DeselectValidPositions(_playerPiece, cardType);
 
         private void SelectValidPositions(Piece<Hex> piece, CardType cardtype)
         {
@@ -155,31 +156,26 @@ namespace GameSystem
             foreach (var hex in hexes)
                 hex.Highlight = true;
         }
+        private void DeselectValidPositions(Piece<Hex> piece, CardType cardtype)
+        {
+            var hexes = _moveManager.ValidPositionsFor(piece, cardtype);
+            foreach (var hex in hexes)
+                hex.Highlight = false;
+        }
 
         private void SelectIsolated(Piece<Hex> piece, CardType cardtype, Hex hex)
         {
-            //Deselect all highlighted tiles
-            DeselectValidPositions(cardtype);
-
             //Reselect all isolated tiles.
             var hexes = _moveManager.IsolatedPositionsFor(piece, cardtype, hex);
             foreach (var h in hexes)
                 h.Highlight = true;
         }
-
         private void DeselectIsolated(Piece<Hex> piece, CardType cardtype, Hex hex)
         {
             //Reselect all isolated tiles.
             var hexes = _moveManager.IsolatedPositionsFor(piece, cardtype, hex);
             foreach (var h in hexes)
                 h.Highlight = false;
-        }
-
-        private void DeselectValidPositions(Piece<Hex> piece, CardType cardtype)
-        {
-            var hexes = _moveManager.ValidPositionsFor(piece, cardtype);
-            foreach (var hex in hexes)
-                hex.Highlight = false;
         }
     }
 }

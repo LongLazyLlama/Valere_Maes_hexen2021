@@ -19,7 +19,7 @@ namespace GameSystem
         }
     }
 
-    public class Hex : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler, IPosition
+    public class Hex : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPosition
     {
         [SerializeField]
         private UnityEvent OnActivate;
@@ -74,23 +74,14 @@ namespace GameSystem
 
                 //Debug.Log("on hex");
             }
-            else if (card != null)
-            {
-                card.TryGetComponent<CardView>(out CardView cardView);
-                GameLoop.gameLoop.SelectIsolated(cardView.CardType, this);
-
-                //Debug.Log("on highlighted hex");
-            }
-        }
-
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            GameObject card = eventData.pointerDrag;
-
             if (_isHighlighted && card != null)
             {
                 card.TryGetComponent<CardView>(out CardView cardView);
-                GameLoop.gameLoop.DeselectIsolated(cardView.CardType, this);
+
+                GameLoop.gameLoop.DeselectValidPositions(cardView.CardType);
+                GameLoop.gameLoop.SelectIsolated(cardView.CardType, this);
+
+                //Debug.Log("on highlighted hex");
             }
         }
     }

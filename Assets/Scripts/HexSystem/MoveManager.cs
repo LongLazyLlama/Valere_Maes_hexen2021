@@ -81,9 +81,6 @@ namespace HexSystem
 
                 Debug.Log($"Swipe moveset now contains {movecount} moves.");
             }
-
-            //_moves.Add(PieceType.Pawn, new PawnMove(board, grid));
-            //_moves.Add(PieceType.Pawn, new PawnDoubleMove());
         }
 
         //Returns a list of valid positions for a Card.

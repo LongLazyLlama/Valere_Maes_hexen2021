@@ -125,9 +125,9 @@ namespace HexSystem
                     {
                         //Set all values back to default.
                         steps = 0;
-                        nextCoordinateV = currentCoordinates.v + vOffset;
-                        nextCoordinateA = currentCoordinates.a + aOffset;
-                        nextCoordinateL = currentCoordinates.l + lOffset;
+                        nextCoordinateV = currentCoordinates.v;
+                        nextCoordinateA = currentCoordinates.a;
+                        nextCoordinateL = currentCoordinates.l;
 
                         //The hex with the mousepointer ontop is in this direction.
                         _isolatedDirection = true;
@@ -202,7 +202,8 @@ namespace HexSystem
         }
 
 
-        public delegate bool Validator(Board<Piece<TPosition>, TPosition> board, HexGrid<TPosition> grid, Piece<TPosition> piece, TPosition toPosition);
+        public delegate bool Validator(Board<Piece<TPosition>, TPosition> board, HexGrid<TPosition> grid, 
+            Piece<TPosition> piece, TPosition toPosition);
 
         public static bool Empty(Board<Piece<TPosition>, TPosition> board, HexGrid<TPosition> hexGrid, Piece<TPosition> piece, TPosition toPosition)
             => !board.TryGetPiece(toPosition, out var _);
@@ -220,22 +221,5 @@ namespace HexSystem
 
         //    return distance;
         //}
-
-        //public Vector3 GetPlayerPosition(Vector3 playerCartesianCoord)
-        //{
-        //    return HexGrid.CartesianCoordinatesToCube(playerCartesianCoord);
-        //}
-
-
-        //var playerStartWorldPos = GameObject.FindGameObjectWithTag("Player").transform.position;
-        //var playerCurrentWorldPos = CartesianCoordinate;
-
-        //var playerCubeStartPos = _positionHelper.HexGrid.CartesianCoordinatesToCube(playerStartWorldPos);
-        //var playerCubeCurrentPos = _positionHelper.HexGrid.CartesianCoordinatesToCube(playerCurrentWorldPos);
-
-        //    if (_positionHelper.Distance(playerCubeStartPos, playerCubeCurrentPos) <= 1)
-        //    {
-        //        GameObject.FindGameObjectWithTag("Player").transform.position = CartesianCoordinate;
-        //    }
     }
 }
