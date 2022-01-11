@@ -494,7 +494,7 @@ MonoBehaviour:
   _coordinateConverter: {fileID: 11400000, guid: daa16fceabe8f3b46b85e6692ebbb9ab, type: 2}
   _currentPlayerID: 1
   _hexSize: 2
-  _gridSize: 3
+  _gridSize: 6
 --- !u!4 &1058338892
 Transform:
   m_ObjectHideFlags: 0
@@ -582,6 +582,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1479553888}
     m_Modifications:
+    - target: {fileID: 959093010715911089, guid: 00397b73c1c4f154697908f343860499, type: 3}
+      propertyPath: _playerID
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5990218193049566690, guid: 00397b73c1c4f154697908f343860499, type: 3}
       propertyPath: m_RootOrder
       value: 3
@@ -722,6 +726,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1479553888}
     m_Modifications:
+    - target: {fileID: 959093010715911089, guid: 00397b73c1c4f154697908f343860499, type: 3}
+      propertyPath: _playerID
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5990218193049566690, guid: 00397b73c1c4f154697908f343860499, type: 3}
       propertyPath: m_RootOrder
       value: 5
@@ -899,7 +907,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 578764175241707171, guid: 330a6c59f6945bf458041575c7e62750, type: 3}
       propertyPath: _playerID
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1874071713687923480, guid: 330a6c59f6945bf458041575c7e62750, type: 3}
       propertyPath: m_Name

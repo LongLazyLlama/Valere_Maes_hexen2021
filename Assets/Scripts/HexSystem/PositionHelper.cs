@@ -123,8 +123,8 @@ namespace HexSystem
 
                     if (pp == mp && !_isolatedDirection)
                     {
-                        //Set all values back to default.
-                        steps = 0;
+                        //Set all values back to default (steps -1 because it still goes up by one at the end of the loop = 0).
+                        steps = -1;
                         nextCoordinateV = currentCoordinates.v;
                         nextCoordinateA = currentCoordinates.a;
                         nextCoordinateL = currentCoordinates.l;

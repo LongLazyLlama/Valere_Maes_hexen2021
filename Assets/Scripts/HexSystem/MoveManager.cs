@@ -20,6 +20,7 @@ namespace HexSystem
 
         private Board<Piece<TPosition>, TPosition> _board;
         private HexGrid<TPosition> _hexgrid;
+        private Piece<TPosition> _playerPiece;
 
         public MoveManager(Board<Piece<TPosition>, TPosition> board, HexGrid<TPosition> grid,
             int gridSize, Piece<TPosition> playerPiece)
@@ -27,6 +28,7 @@ namespace HexSystem
             _board = board;
             _hexgrid = grid;
             _maxSteps = gridSize * 2;
+            _playerPiece = playerPiece;
 
             //subscribes to the piece events.
             _board.PieceMoved += (s, e) => e.Piece.MoveTo(e.ToPosition);
@@ -48,7 +50,6 @@ namespace HexSystem
             _moves.Add(CardType.Teleport,
                 new ConfigurableMove<TPosition>(board, grid, (b, h, p)
                 => new PositionHelper<TPosition>(b, h, p)
-                        .AnyEmpty()
                         .CollectValidPositions()));
 
             _moves.Add(CardType.Slash,
@@ -94,17 +95,52 @@ namespace HexSystem
             return result;
         }
 
-        public List<TPosition> IsolatedPositionsFor(Piece<TPosition> piece, CardType cardType, TPosition hex)
+        public List<TPosition> IsolatedPositionsFor(Piece<TPosition> piece, CardType cardType, TPosition mousePosHex)
         {
             //Take all previously highlighted hexes.
             var validHexes = ValidPositionsFor(piece, cardType);
+            var maxSteps = GetMaxRange(cardType, validHexes);
 
-            //Find all hexes in the direction of the card in comparison to the player.
-            var isolatedHexes =
-                new PositionHelper<TPosition>(_board, _hexgrid, piece)
-                .CollectIsolatedPositions(validHexes, _maxSteps, hex);
+            List<TPosition> isolatedHexes = default;
+            if (cardType == CardType.Teleport)
+            {
+                //new PositionHelper<TPosition>(_board, _hexgrid, piece);
+                isolatedHexes.Add(mousePosHex);
 
-            return isolatedHexes;
+                return isolatedHexes;
+            }
+            else
+            {
+                //Find all hexes in the direction of the card in comparison to the player.
+                isolatedHexes = new PositionHelper<TPosition>(_board, _hexgrid, piece)
+                    .CollectIsolatedPositions(validHexes, maxSteps, mousePosHex);
+
+                return isolatedHexes;
+            }
+        }
+
+        private int GetMaxRange(CardType cardType, List<TPosition> positions)
+        {
+            //Kind of a cheat workaround but it works :)
+            List<int> values = new List<int>();
+
+            foreach (var hex in positions)
+            {
+                _hexgrid.TryGetCubeCoordinateAt(hex, out var cc);
+                _board.TryGetPosition(_playerPiece, out var pos);
+                _hexgrid.TryGetCubeCoordinateAt(pos, out var pp);
+
+                var stepvalue = (cc.v - pp.v, cc.a - pp.a, cc.l - pp.l);
+                var highestValue = Mathf.Max(stepvalue.Item1, stepvalue.Item2, stepvalue.Item3);
+
+                values.Add(highestValue);
+            }
+
+            var maxRange = Mathf.Max(values.ToArray());
+
+            Debug.Log($"The max range of {cardType} is: {maxRange}");
+
+            return maxRange;
         }
 
         public void Move(Piece<TPosition> piece, TPosition position, CardType cardType)
