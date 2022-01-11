@@ -10,7 +10,7 @@ namespace BoardSystem
     {
         public int GridSize { get; }
 
-        private BidirectionalDictionary<TPosition, (int v, int a, int l)> _positions
+        public BidirectionalDictionary<TPosition, (int v, int a, int l)> Positions
             = new BidirectionalDictionary<TPosition, (int v, int a, int l)>();
 
         //Creates a new hexgrid.
@@ -39,10 +39,10 @@ namespace BoardSystem
 
         //Takes a position or cubeCoordinate from the dictionary.
         public bool TryGetPositionAt(int v, int a, int l, out TPosition position)
-            => _positions.TryGetKey((v, a, l), out position);
+            => Positions.TryGetKey((v, a, l), out position);
 
         public bool TryGetCubeCoordinateAt(TPosition position, out (int v, int a, int l) cubeCoordinate)
-            => _positions.TryGetValue(position, out cubeCoordinate);
+            => Positions.TryGetValue(position, out cubeCoordinate);
 
         //Adds all generated coordinates to the dictionary.
         public void Register(TPosition position, int v, int a, int l)
@@ -56,7 +56,7 @@ namespace BoardSystem
             if (l < -GridSize || l > GridSize)
                 throw new ArgumentException(nameof(l));
 
-            _positions.Add(position, (v, a, l));
+            Positions.Add(position, (v, a, l));
 
             //Debug.Log("Cube coordinate Registered at position: " + new Vector3(v, a, l));
         }

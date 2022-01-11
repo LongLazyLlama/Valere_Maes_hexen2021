@@ -142,19 +142,31 @@ namespace GameSystem
 
         public void CardSelected(CardType cardType)
             => OnCardSelected(_playerPiece, cardType);
+        public void CardOverHighlightHex(CardType cardType)
+            => OnCardOverHighlightHex(_playerPiece, cardType);
         public void CardDeSelected(CardType cardType)
             => OnCardDeselected(_playerPiece, cardType);
 
         private void OnCardSelected(Piece<Hex> piece, CardType cardtype)
         {
-            //e.SelectionItem.Activate = true;
             var hexes = _moveManager.ValidPositionsFor(piece, cardtype);
             foreach (var hex in hexes)
                 hex.Highlight = true;
         }
+
+        private void OnCardOverHighlightHex(Piece<Hex> piece, CardType cardtype)
+        {
+            //Deselect all highlighted tiles
+            CardDeSelected(cardtype);
+
+            //Reselect all isolated tiles.
+            var hexes = _moveManager.IsolatedPositionsFor(piece, cardtype);
+            foreach (var hex in hexes)
+                hex.Highlight = true;
+        }
+
         private void OnCardDeselected(Piece<Hex> piece, CardType cardtype)
         {
-            //e.SelectionItem.Activate = false;
             var tiles = _moveManager.ValidPositionsFor(piece, cardtype);
             foreach (var tile in tiles)
                 tile.Highlight = false;

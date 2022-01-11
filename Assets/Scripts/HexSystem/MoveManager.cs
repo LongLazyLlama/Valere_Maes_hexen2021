@@ -46,9 +46,9 @@ namespace HexSystem
                         .CollectValidPositions()));
 
             _moves.Add(CardType.Teleport,
-                new ConfigurableMove<TPosition>(board, grid, (b, g, p)
-                => new PositionHelper<TPosition>(b, g, p)
-                        .Any()
+                new ConfigurableMove<TPosition>(board, grid, (b, h, p)
+                => new PositionHelper<TPosition>(b, h, p)
+                        .AnyEmpty()
                         .CollectValidPositions()));
 
             _moves.Add(CardType.Slash,
@@ -95,6 +95,17 @@ namespace HexSystem
                         .ToList();
 
             return result;
+        }
+
+        public List<TPosition> IsolatedPositionsFor(Piece<TPosition> piece, CardType cardType)
+        {
+            //Take all previously highlighted hexes.
+            var validHexes = ValidPositionsFor(piece, cardType);
+
+            //Find all hexes in the direction of the card in comparison to the player.
+            var isolatedHexes = validHexes;
+
+            return isolatedHexes;
         }
 
         public void Move(Piece<TPosition> piece, TPosition position, CardType cardType)

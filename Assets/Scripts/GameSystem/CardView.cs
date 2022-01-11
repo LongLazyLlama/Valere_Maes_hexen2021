@@ -8,32 +8,54 @@ using System;
 
 namespace GameSystem
 {
-    public class CardView : MonoBehaviour, IDragHandler, IDropHandler
+    public class CardView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         [SerializeField]
-        private CardType _cardType;
+        private Canvas _canvas;
+
+        public CardType CardType;
+
         [SerializeField]
         private Vector3 _offsetFromMouse = new Vector3(0, -100, 0);
 
+        [HideInInspector]
+        public bool CardUsed;
+
+        private CanvasGroup _canvasGroup;
         private Vector3 _startPosition;
 
         private void Start()
         {
             _startPosition = this.transform.position;
+            _canvasGroup = _canvas.GetComponent<CanvasGroup>();
         }
 
+        public void OnBeginDrag(PointerEventData eventData)
+        {
+            _canvasGroup.blocksRaycasts = false;
+        }
+        
         public void OnDrag(PointerEventData eventData)
         {
-            GameLoop.gameLoop.CardSelected(_cardType);
             this.transform.position = Input.mousePosition + _offsetFromMouse;
-            //this.gameObject.GetComponent<Image>().raycastTarget = false;
         }
 
-        public void OnDrop(PointerEventData eventData)
+        public void OnEndDrag(PointerEventData eventData)
         {
-            GameLoop.gameLoop.CardDeSelected(_cardType);
-            this.transform.position = _startPosition;
-            //this.gameObject.GetComponent<Image>().raycastTarget = true;
+            if (CardUsed)
+            {
+                GameLoop.gameLoop.CardDeSelected(CardType);
+                _canvasGroup.blocksRaycasts = true;
+
+                Destroy(this.gameObject);
+            }
+            else
+            {
+                GameLoop.gameLoop.CardDeSelected(CardType);
+                this.transform.position = _startPosition;
+
+                _canvasGroup.blocksRaycasts = true;
+            }
         }
     }
 }

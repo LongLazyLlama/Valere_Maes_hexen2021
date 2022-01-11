@@ -19,47 +19,68 @@ namespace GameSystem
         }
     }
 
-    public class Hex : MonoBehaviour, IPointerClickHandler, IDropHandler, IPosition
+    public class Hex : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPosition
     {
         [SerializeField]
         private UnityEvent OnActivate;
         [SerializeField]
         private UnityEvent OnDeactivate;
 
+        private bool _isHighlighted;
         public bool Highlight
         {
             set
             {
                 if (value)
+                {
+                    _isHighlighted = true;
                     OnActivate.Invoke();
+                }
                 else
+                {
+                    _isHighlighted = false;
                     OnDeactivate.Invoke();
+                }
             }
         }
 
         public void OnDrop(PointerEventData eventData)
         {
-            throw new NotImplementedException();
+            if (!_isHighlighted)
+            {
+                //Debug.Log("Dropped on hex.");
+            }
+            else
+            {
+                //Debug.Log("Dropped on highlighted hex.");
+
+                GameObject droppedCard = eventData.pointerDrag;
+
+                droppedCard.TryGetComponent<CardView>(out CardView cardView);
+                cardView.CardUsed = true;
+            }
         }
 
-        public void OnPointerClick(PointerEventData eventData)
+        public void OnPointerEnter(PointerEventData eventData)
         {
-            
+            if (!_isHighlighted)
+            {
+                GameObject card = eventData.pointerDrag;
+
+                card.TryGetComponent<CardView>(out CardView cardView);
+                GameLoop.gameLoop.CardSelected(cardView.CardType);
+
+                Debug.Log("on hex");
+            }
+            else
+            {
+                GameObject card = eventData.pointerDrag;
+
+                card.TryGetComponent<CardView>(out CardView cardView);
+                GameLoop.gameLoop.CardOverHighlightHex(cardView.CardType);
+
+                Debug.Log("on highlighted hex");
+            }
         }
-
-        //------------------------------------------------------------------------------------------------------
-
-        //public void OnPointerClick(PointerEventData eventData)
-        //{
-        //    //Debug.Log($"Tile {gameObject.name} at position {_positionHelper.WorldToGridPosition()}")
-        //    //FindObjectOfType<GameLoop>().DebugTile(this);
-        //    OnClick(new HexEventArgs(this));
-        //}
-
-        //protected virtual void OnClick(HexEventArgs eventArgs)
-        //{
-        //    var handler = Clicked;
-        //    handler?.Invoke(this, eventArgs);
-        //}
     }
 }

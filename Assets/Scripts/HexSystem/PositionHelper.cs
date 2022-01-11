@@ -46,10 +46,35 @@ namespace HexSystem
         public PositionHelper<TPosition> NorthWest(int maxRange = int.MaxValue, params Validator[] validators)
            => Collect(0, -1, 1, maxRange, validators);
 
-        //Takes any valid position in range
-        public PositionHelper<TPosition> Any(int maxRange = int.MaxValue, params Validator[] validators) 
+        //Targets any piece on the board at any distance. (forbidden move)
+        public PositionHelper<TPosition> AnyPiece(params Validator[] validators) 
         {
-            throw new ArgumentException();
+            foreach (var position in _hexGrid.Positions.Values)
+            {
+                _hexGrid.TryGetPositionAt(position.v, position.a, position.l, out TPosition hex);
+
+                if (_board.TryGetPiece(hex, out Piece<TPosition> piece) && piece.PlayerID != 1)
+                {
+                    _validPositions.Add(hex);
+                }
+            }
+
+            return this;
+        }
+        //Targets any empty hex on the board at any distance.
+        public PositionHelper<TPosition> AnyEmpty(params Validator[] validators)
+        {
+            foreach (var position in _hexGrid.Positions.Values)
+            {
+                _hexGrid.TryGetPositionAt(position.v, position.a, position.l, out TPosition hex);
+
+                if (!_board.TryGetPiece(hex, out Piece<TPosition> p))
+                {
+                    _validPositions.Add(hex);
+                }
+            }
+
+            return this;
         }
 
         //Third constructor collects all positions for the selected pawn.
@@ -119,6 +144,14 @@ namespace HexSystem
                 //    steps++;
                 //}
             }
+
+            return this;
+        }
+
+        public PositionHelper<TPosition> CollectIsolatedPositions(int vOffset, int aOffset, int lOffset,
+            int maxSteps = int.MaxValue, params Validator[] validators)
+        {
+
 
             return this;
         }
