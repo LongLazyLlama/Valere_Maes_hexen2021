@@ -38,6 +38,7 @@ namespace GameSystem
                 gameLoop = this;
             }
 
+            var deck = new DeckManager();
             var board = new Board<Piece<Hex>, Hex>();
             var grid = new HexGrid<Hex>(_gridSize);
 
@@ -70,12 +71,9 @@ namespace GameSystem
 
         private void ConnectHex(HexGrid<Hex> grid, Vector3 cubeCoordinate, Hex hex)
         {
-            //tile.Clicked += (s, e) => Select(e.Tile);
-
             //Registers the hex.
             grid.Register(hex, (int)cubeCoordinate.x, (int)cubeCoordinate.y, (int)cubeCoordinate.z);
         }
-
         private void ConnectPiece(Board<Piece<Hex>, Hex> board, HexGrid<Hex> grid)
         {
             var pieceViews = FindObjectsOfType<PieceView>();

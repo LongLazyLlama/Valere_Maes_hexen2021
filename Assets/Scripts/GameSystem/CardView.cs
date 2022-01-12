@@ -10,9 +10,6 @@ namespace GameSystem
 {
     public class CardView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
-        [SerializeField]
-        private Canvas _canvas;
-
         public CardType CardType;
 
         [SerializeField]
@@ -27,7 +24,7 @@ namespace GameSystem
         private void Start()
         {
             _startPosition = this.transform.position;
-            _canvasGroup = _canvas.GetComponent<CanvasGroup>();
+            _canvasGroup = this.GetComponentInParent<CanvasGroup>();
         }
 
         public void OnBeginDrag(PointerEventData eventData)
@@ -46,7 +43,10 @@ namespace GameSystem
             _canvasGroup.blocksRaycasts = true;
 
             if (CardUsed)
+            {
+                DeckManager.Deck.CardUsed(_startPosition);
                 Destroy(this.gameObject);
+            }
             else
                 this.transform.position = _startPosition;
         }
