@@ -109,11 +109,19 @@ namespace HexSystem
 
                 return isolatedHexes;
             }
+            else if (cardType == CardType.Slash || cardType == CardType.Pushback)
+            {
+                //Find all hexes in the direction of the card in comparison to the player.
+                isolatedHexes = new PositionHelper<TPosition>(_board, _hexgrid, piece)
+                    .CollectIsolatedPositions(maxSteps, mousePosHex, true);
+
+                return isolatedHexes;
+            }
             else
             {
                 //Find all hexes in the direction of the card in comparison to the player.
                 isolatedHexes = new PositionHelper<TPosition>(_board, _hexgrid, piece)
-                    .CollectIsolatedPositions(validHexes, maxSteps, mousePosHex);
+                    .CollectIsolatedPositions(maxSteps, mousePosHex, false);
 
                 return isolatedHexes;
             }
@@ -138,7 +146,7 @@ namespace HexSystem
 
             var maxRange = Mathf.Max(values.ToArray());
 
-            Debug.Log($"The max range of {cardType} is: {maxRange}");
+            //Debug.Log($"The max range of {cardType} is: {maxRange}");
 
             return maxRange;
         }
