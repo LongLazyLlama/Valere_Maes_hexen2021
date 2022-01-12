@@ -19,7 +19,6 @@ namespace GameSystem
 
         private Piece<Hex> _playerPiece;
         private MoveManager<Hex> _moveManager;
-        private SelectionManager<Piece<Hex>> _selectionManager;
 
         [SerializeField]
         private int _currentPlayerID = 1;
@@ -47,7 +46,6 @@ namespace GameSystem
             GetPlayerPiece(board, grid, out var playerPiece);
 
             _playerPiece = playerPiece;
-            _selectionManager = new SelectionManager<Piece<Hex>>();
             _moveManager = new MoveManager<Hex>(board, grid, _gridSize, playerPiece);
         }
 

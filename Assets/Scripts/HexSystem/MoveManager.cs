@@ -50,6 +50,7 @@ namespace HexSystem
             _moves.Add(CardType.Teleport,
                 new ConfigurableMove<TPosition>(board, grid, (b, h, p)
                 => new PositionHelper<TPosition>(b, h, p)
+                        .AnyEmpty()
                         .CollectValidPositions()));
 
             _moves.Add(CardType.Slash,
@@ -104,10 +105,10 @@ namespace HexSystem
             List<TPosition> isolatedHexes = default;
             if (cardType == CardType.Teleport)
             {
-                //new PositionHelper<TPosition>(_board, _hexgrid, piece);
-                isolatedHexes.Add(mousePosHex);
+                validHexes.Clear();
+                validHexes.Add(mousePosHex);
 
-                return isolatedHexes;
+                return validHexes;
             }
             else if (cardType == CardType.Slash || cardType == CardType.Pushback)
             {
