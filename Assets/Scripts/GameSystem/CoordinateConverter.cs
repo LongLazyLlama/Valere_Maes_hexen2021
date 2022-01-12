@@ -13,7 +13,7 @@ namespace GameSystem
             var hexWidth = Mathf.Sqrt(3) * hexSize;
             var HexHeight = hexSize * 2;
 
-            var cartesianX = (cubeCoordinate.x * hexWidth) + (cubeCoordinate.z * (hexWidth / 2)); 
+            var cartesianX = (cubeCoordinate.x * hexWidth) + (cubeCoordinate.z * (hexWidth / 2));
             var cartesianY = 0;
             var cartesianZ = cubeCoordinate.z * (HexHeight * (3.0f / 4.0f));
 
@@ -25,32 +25,11 @@ namespace GameSystem
             //Returns a cube coordinate representing the vector in the hexgrid.
             var cubeX = Mathf.RoundToInt((Mathf.Sqrt(3) / 3 * cartesianCoordinate.x - 1.0f / 3 * cartesianCoordinate.z) / hexSize);
             var cubeZ = Mathf.RoundToInt((2.0f / 3 * cartesianCoordinate.z) / hexSize);
-            var cubeY = Mathf.RoundToInt(-cubeX -cubeZ);
+            var cubeY = Mathf.RoundToInt(-cubeX - cubeZ);
 
             //Debug.Log($"WorldPosition {cartesianCoordinate} converted to cube {new Vector3(cubeX, cubeY, cubeZ)}");
 
             return (cubeX, cubeY, cubeZ);
         }
-
-        //public HexData AddToCubeCoordinate(Vector3 vectorData)
-        //{
-        //    //Adds any vector data to the hex (positions, rotations, etc..)
-        //    Vector3 cubeCoordinate = new Vector3(
-        //        CubeCoordinates.x + vectorData.x,
-        //        CubeCoordinates.y + vectorData.y,
-        //        CubeCoordinates.z + vectorData.z);
-
-        //    return new HexData(cubeCoordinate);
-        //}
-
-        //public HexData SubtractFromCubeCoordinate(Vector3 vectorData)
-        //{
-        //    Vector3 cubeCoordinate = new Vector3(
-        //        CubeCoordinates.x - vectorData.x,
-        //        CubeCoordinates.y - vectorData.y,
-        //        CubeCoordinates.z - vectorData.z);
-
-        //    return new HexData(cubeCoordinate);
-        //}
     }
 }

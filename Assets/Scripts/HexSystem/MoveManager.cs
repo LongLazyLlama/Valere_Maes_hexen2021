@@ -18,6 +18,8 @@ namespace HexSystem
         private MultiValueDictionary<CardType, IMove<TPosition>> _moves = 
             new MultiValueDictionary<CardType, IMove<TPosition>>();
 
+        private List<TPosition> _isolatedHexes = default;
+
         private Board<Piece<TPosition>, TPosition> _board;
         private HexGrid<TPosition> _hexgrid;
         private Piece<TPosition> _playerPiece;
@@ -100,9 +102,8 @@ namespace HexSystem
         {
             //Take all previously highlighted hexes.
             var validHexes = ValidPositionsFor(piece, cardType);
-            var maxSteps = GetMaxRange(cardType, validHexes);
+            var maxSteps = GetMaxRange(validHexes);
 
-            List<TPosition> isolatedHexes = default;
             if (cardType == CardType.Teleport)
             {
                 validHexes.Clear();
@@ -113,22 +114,22 @@ namespace HexSystem
             else if (cardType == CardType.Slash || cardType == CardType.Pushback)
             {
                 //Find all hexes in the direction of the card in comparison to the player.
-                isolatedHexes = new PositionHelper<TPosition>(_board, _hexgrid, piece)
+                _isolatedHexes = new PositionHelper<TPosition>(_board, _hexgrid, piece)
                     .CollectIsolatedPositions(maxSteps, mousePosHex, true);
 
-                return isolatedHexes;
+                return _isolatedHexes;
             }
             else
             {
                 //Find all hexes in the direction of the card in comparison to the player.
-                isolatedHexes = new PositionHelper<TPosition>(_board, _hexgrid, piece)
+                _isolatedHexes = new PositionHelper<TPosition>(_board, _hexgrid, piece)
                     .CollectIsolatedPositions(maxSteps, mousePosHex, false);
 
-                return isolatedHexes;
+                return _isolatedHexes;
             }
         }
 
-        private int GetMaxRange(CardType cardType, List<TPosition> positions)
+        private int GetMaxRange(List<TPosition> positions)
         {
             //Kind of a cheat workaround but it works :)
             List<int> values = new List<int>();
@@ -152,7 +153,7 @@ namespace HexSystem
             return maxRange;
         }
 
-        public void Move(Piece<TPosition> piece, TPosition position, CardType cardType)
+        public void ExecuteCard(Piece<TPosition> piece, TPosition position, CardType cardType)
         {
             //neemt alle mogelijke moves.
             var move = _moves[cardType]
@@ -160,10 +161,7 @@ namespace HexSystem
                 .Where(m => m.Positions(piece).Contains(position))
                 .First();
 
-            move.Execute(piece, position);
-            //get first moves
-            //of which position is part of validmoves.
-            //execute.
+            move.Execute(piece, position, _isolatedHexes, cardType);
         }
     }
 }

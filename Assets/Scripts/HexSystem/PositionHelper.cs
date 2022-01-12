@@ -92,8 +92,8 @@ namespace HexSystem
         }
 
         //Third constructor collects all positions for the selected pawn.
-        public PositionHelper<TPosition> Collect(int vOffset, int aOffset, int lOffset, bool isolatedSelection, bool usesNeighbours,
-            TPosition mouseHexPos, int maxSteps = int.MaxValue, params Validator[] validators)
+        public PositionHelper<TPosition> Collect(int vOffset, int aOffset, int lOffset, bool isolatedSelection, 
+            bool usesNeighbours, TPosition mouseHexPos, int maxSteps = int.MaxValue, params Validator[] validators)
         {
             //Gets the position of the selected pawn.
             if (!_board.TryGetPosition(_piece, out var currentPosition))
@@ -211,7 +211,11 @@ namespace HexSystem
             var previousNeighbourL = playerPosition.Item3 + _hexDirections[previousIndex].Item3;
 
             _hexGrid.TryGetPositionAt(previousNeighbourV, previousNeighbourA, previousNeighbourL, out var previousNeighbour);
-            _isolatedPositions.Add(previousNeighbour);
+
+            if (previousNeighbour != null)
+            {
+                _isolatedPositions.Add(previousNeighbour);
+            }
 
             //Get next Neighbour.
             var nextIndex = mouseDirIndex + 1;
@@ -223,15 +227,21 @@ namespace HexSystem
             var nextNeighbourL = playerPosition.Item3 + _hexDirections[nextIndex].Item3;
 
             _hexGrid.TryGetPositionAt(nextNeighbourV, nextNeighbourA, nextNeighbourL, out var nextNeighbour);
-            _isolatedPositions.Add(nextNeighbour);
+
+            if (nextNeighbour != null)
+            {
+                _isolatedPositions.Add(nextNeighbour);
+            }
         }
 
         public delegate bool Validator(Board<Piece<TPosition>, TPosition> board, HexGrid<TPosition> grid, 
             Piece<TPosition> piece, TPosition toPosition);
 
-        public static bool Empty(Board<Piece<TPosition>, TPosition> board, HexGrid<TPosition> hexGrid, Piece<TPosition> piece, TPosition toPosition)
+        public static bool Empty(Board<Piece<TPosition>, TPosition> board, HexGrid<TPosition> hexGrid, 
+            Piece<TPosition> piece, TPosition toPosition)
             => !board.TryGetPiece(toPosition, out var _);
-        public static bool ContainsEnemy(Board<Piece<TPosition>, TPosition> board, HexGrid<TPosition> hexGrid, Piece<TPosition> piece, TPosition toPosition)
+        public static bool ContainsEnemy(Board<Piece<TPosition>, TPosition> board, HexGrid<TPosition> hexGrid, 
+            Piece<TPosition> piece, TPosition toPosition)
             => board.TryGetPiece(toPosition, out var toPiece) && toPiece.PlayerID != piece.PlayerID;
 
         //--------------------------------------------------------------------------------------------------------------------

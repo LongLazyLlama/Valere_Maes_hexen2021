@@ -148,6 +148,9 @@ namespace GameSystem
         public void DeselectIsolated(CardType cardType, Hex hex)
             => DeselectIsolated(_playerPiece, cardType, hex);
 
+        public void ExecuteCard(CardType cardType, Hex hex)
+            => _moveManager.ExecuteCard(_playerPiece, hex, cardType);
+
         private void SelectValidPositions(Piece<Hex> piece, CardType cardtype)
         {
             var hexes = _moveManager.ValidPositionsFor(piece, cardtype);

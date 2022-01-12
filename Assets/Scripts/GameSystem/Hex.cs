@@ -58,6 +58,7 @@ namespace GameSystem
                 droppedCard.TryGetComponent<CardView>(out CardView cardView);
 
                 GameLoop.gameLoop.DeselectIsolated(cardView.CardType, this);
+                GameLoop.gameLoop.ExecuteCard(cardView.CardType, this);
 
                 cardView.CardUsed = true;
             }

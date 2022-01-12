@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CardSystem;
 
 namespace HexSystem
 {
@@ -11,7 +12,7 @@ namespace HexSystem
     {
         bool CanExecute(Piece<TPosition> piece);
 
-        void Execute(Piece<TPosition> piece, TPosition position);
+        void Execute(Piece<TPosition> piece, TPosition position, List<TPosition> isolatedPositions, CardType cardType);
 
         List<TPosition> Positions(Piece<TPosition> piece);
     }

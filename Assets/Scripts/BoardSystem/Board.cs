@@ -87,11 +87,11 @@ namespace BoardSystem
         public void Move(TPiece piece, TPosition toPosition)
         {
             //Tries to get the position of the piece and stores it in fromposition, otherwise return.
-            if (TryGetPosition(piece, out var fromPosition))
+            if (!TryGetPosition(piece, out var fromPosition))
                 return;
 
             //If it fails to get the piece, return. OUT returns nothing because you already have the piece variable.
-            if (!TryGetPiece(toPosition, out _))
+            if (TryGetPiece(toPosition, out _))
                 return;
 
             //Removes the piece from the list so it can be added again with the new position, if it fails, return.

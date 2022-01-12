@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BoardSystem;
+using CardSystem;
 
 namespace HexSystem.Moves
 {
@@ -23,31 +24,57 @@ namespace HexSystem.Moves
         public bool CanExecute(Piece<TPosition> piece)
             => true;
 
-        public void Execute(Piece<TPosition> piece, TPosition position)
+        public void Execute(Piece<TPosition> piece, TPosition position , List<TPosition> isolatedPositions, CardType cardType)
         {
-            //zoekt de old position.
-            if (Board.TryGetPosition(piece, out var oldPosition))
+            //Takes the old position.
+            if (!Board.TryGetPosition(piece, out var oldPosition))
                 return;
 
-            var pieceTaken = Board.TryGetPiece(position, out var toPiece);
-
-            //Lambda's houden alle data in een object uit de stack.
-            Action forward = () =>
+            switch (cardType)
             {
-                //is there a piece on position
-                if (pieceTaken)
-                    //take piece
-                    Board.Take(toPiece);
+                case CardType.Pushback :
+                {
+                    foreach (var pos in isolatedPositions)
+                    {
+                        //If there is a piece on the new position, take it.
+                        var pieceTaken = Board.TryGetPiece(pos, out var toPiece);
 
 
-                //move to position
-                Board.Move(piece, position);
-            };
+                        //if (pieceTaken)
+                        //    Board.Move(toPiece);
+                    }
 
-            Action backward = () =>
-            {
-                Board.Move(piece, oldPosition);
-            };
+                    break;
+
+                }
+                case CardType.Teleport :
+                {
+                    Board.Move(piece, position);
+                    break;
+                }
+                case CardType.Slash :
+                {
+                    foreach (var pos in isolatedPositions)
+                    {
+                        //If there is a piece on the new position, take it.
+                        var pieceTaken = Board.TryGetPiece(pos, out var toPiece);
+                        if (pieceTaken)
+                            Board.Take(toPiece);
+                    }
+                    break;
+                }
+                case CardType.Swipe :
+                {
+                    foreach (var pos in isolatedPositions)
+                    {
+                        //If there is a piece on the new position, take it.
+                        var pieceTaken = Board.TryGetPiece(pos, out var toPiece);
+                        if (pieceTaken)
+                            Board.Take(toPiece);
+                    }
+                    break;
+                }
+            }
         }
 
         public abstract List<TPosition> Positions(Piece<TPosition> piece);
