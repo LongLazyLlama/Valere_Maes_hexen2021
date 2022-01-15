@@ -74,9 +74,12 @@ namespace HexSystem.Moves
             foreach (var pos in isolatedPositions)
             {
                 //If there is a piece on the new position, take it.
-                var pieceTaken = Board.TryGetPiece(pos, out var toPiece);
-                if (pieceTaken)
-                    Board.Take(toPiece);
+                if (pos != null)
+                {
+                    var pieceTaken = Board.TryGetPiece(pos, out var toPiece);
+                    if (pieceTaken)
+                        Board.Take(toPiece);
+                }
             }
         }
 

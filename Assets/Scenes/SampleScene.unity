@@ -3652,7 +3652,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0.45399043, y: 0, z: 0, w: 0.8910066}
-  m_LocalPosition: {x: -0.08, y: 14.28, z: -17.06}
+  m_LocalPosition: {x: -0.08, y: 15.21, z: -18.34}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -4152,10 +4152,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _hexPrefab: {fileID: 1684534795151036645, guid: 63193a65e0f757341840c92d2b2e6dd7, type: 3}
-  _piecePrefab: {fileID: 1748297882822365219, guid: 00397b73c1c4f154697908f343860499, type: 3}
+  _enemyPrefab: {fileID: 1748297882822365219, guid: 00397b73c1c4f154697908f343860499, type: 3}
+  _playerPrefab: {fileID: 1874071713687923480, guid: 330a6c59f6945bf458041575c7e62750, type: 3}
   _coordinateConverter: {fileID: 11400000, guid: daa16fceabe8f3b46b85e6692ebbb9ab, type: 2}
+  _spawnPlayerRandomly: 1
   _currentPlayerID: 1
-  _enemyCount: 50
+  _enemyCount: 10
   _hexSize: 2
   _gridSize: 3
 --- !u!4 &1058338892

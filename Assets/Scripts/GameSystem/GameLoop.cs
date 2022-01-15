@@ -14,7 +14,9 @@ namespace GameSystem
         [SerializeField]
         private GameObject _hexPrefab;
         [SerializeField]
-        private GameObject _piecePrefab;
+        private GameObject _enemyPrefab;
+        [SerializeField]
+        private GameObject _playerPrefab;
         [SerializeField]
         private CoordinateConverter _coordinateConverter;
 
@@ -23,6 +25,11 @@ namespace GameSystem
         private Piece<Hex> _playerPiece;
         private MoveManager<Hex> _moveManager;
 
+        [Space]
+        [SerializeField]
+        private bool _spawnPlayerRandomly;
+
+        [Space]
         [SerializeField]
         private int _currentPlayerID = 1;
         [SerializeField][Range(1, 50)]
@@ -47,14 +54,32 @@ namespace GameSystem
             var grid = new HexGrid<Hex>(_gridSize);
 
             DeleteHexField();
+            DeletePieces();
+
             GenerateHexField(grid);
-            GenerateEnemies(grid);
+            GeneratePieces(grid);
 
             ConnectPiece(board, grid);
             GetPlayerPiece(board, grid, out var playerPiece);
 
             _playerPiece = playerPiece;
             _moveManager = new MoveManager<Hex>(board, grid, _gridSize, playerPiece);
+        }
+
+        private void DeleteHexField()
+        {
+            foreach (Transform child in transform)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+        private void DeletePieces()
+        {
+            var pieces = FindObjectsOfType<PieceView>();
+            foreach (PieceView piece in pieces)
+            {
+                Destroy(piece.gameObject);
+            }
         }
 
         private void GenerateHexField(HexGrid<Hex> grid)
@@ -75,16 +100,33 @@ namespace GameSystem
                 ConnectHex(grid, cubeCoordinate, hex);
             }
         }
-        private void GenerateEnemies(HexGrid<Hex> grid)
+        private void GeneratePieces(HexGrid<Hex> grid)
         {
             List<int> usedPositions = new List<int>();
 
-            int playerpos = grid.CubeCoordinates.IndexOf(new Vector3(0,0,0));
-            usedPositions.Add(playerpos);
+            if (_spawnPlayerRandomly)
+            {
+                var randomPlayerPos = Random.Range(0, grid.CubeCoordinates.Count);
+                var playerpos = _coordinateConverter.CubeCoordinatesToCartesian
+                        (grid.CubeCoordinates[randomPlayerPos], _hexSize);
+
+                Instantiate(_playerPrefab, playerpos, Quaternion.identity);
+                _playerPos = playerpos;
+
+                usedPositions.Add(randomPlayerPos);
+            }
+            else
+            {
+                int playerpos = grid.CubeCoordinates.IndexOf(new Vector3(0, 0, 0));
+
+                Instantiate(_playerPrefab, Vector3.zero, Quaternion.identity);
+                _playerPos = Vector3.zero;
+
+                usedPositions.Add(playerpos);
+            }
 
             if (_enemyCount > grid.CubeCoordinates.Count)
                 _enemyCount = grid.CubeCoordinates.Count - usedPositions.Count;
-
 
             for (int i = 0; i < _enemyCount; i++)
             {
@@ -95,14 +137,11 @@ namespace GameSystem
                     var worldPos = _coordinateConverter.CubeCoordinatesToCartesian
                         (grid.CubeCoordinates[randomEnemyPos], _hexSize);
 
-                    Instantiate(_piecePrefab, worldPos, Quaternion.identity);
-
+                    Instantiate(_enemyPrefab, worldPos, Quaternion.identity);
                     usedPositions.Add(randomEnemyPos);
                 }
                 else
-                {
                     i--;
-                }
             }
         }
 
@@ -133,17 +172,6 @@ namespace GameSystem
 
         private void GetPlayerPiece(Board<Piece<Hex>, Hex> board, HexGrid<Hex> grid, out Piece<Hex> playerPiece)
         {
-            //var playerPos = GameObject.FindGameObjectWithTag("Player").transform.position;
-
-            var pieces = FindObjectsOfType<PieceView>();
-            foreach (PieceView piece in pieces)
-            {
-                if (piece.PlayerID == _currentPlayerID)
-                {
-                    _playerPos = piece.transform.position;
-                }
-            }
-
             var playerCubePos = _coordinateConverter.CartesianCoordinatesToCube(_playerPos, _hexSize);
 
             if (grid.TryGetPositionAt(playerCubePos.v, playerCubePos.a, playerCubePos.l, out Hex hex))
@@ -156,14 +184,6 @@ namespace GameSystem
             else
             {
                 playerPiece = null;
-            }
-        }
-
-        private void DeleteHexField()
-        {
-            foreach (Transform child in transform)
-            {
-                Destroy(child.gameObject);
             }
         }
 
@@ -200,7 +220,8 @@ namespace GameSystem
             //Reselect all isolated tiles.
             var hexes = _moveManager.IsolatedPositionsFor(piece, cardtype, hex);
             foreach (var h in hexes)
-                h.Highlight = true;
+                if (h != null)
+                    h.Highlight = true;
         }
         public void DeselectIsolated()
         {
@@ -208,7 +229,8 @@ namespace GameSystem
             var hexes = _moveManager._isolatedHexes;
             if (hexes != null)
                 foreach (var h in hexes)
-                    h.Highlight = false;
+                    if (h != null)
+                        h.Highlight = false;
         }
     }
 }
