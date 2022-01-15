@@ -23,13 +23,13 @@ namespace GameSystem
         public (int v, int a, int l) CartesianCoordinatesToCube(Vector3 cartesianCoordinate, float hexSize)
         {
             //Returns a cube coordinate representing the vector in the hexgrid.
-            var cubeX = Mathf.RoundToInt((Mathf.Sqrt(3) / 3 * cartesianCoordinate.x - 1.0f / 3 * cartesianCoordinate.z) / hexSize);
-            var cubeZ = Mathf.RoundToInt((2.0f / 3 * cartesianCoordinate.z) / hexSize);
-            var cubeY = Mathf.RoundToInt(-cubeX - cubeZ);
+            var cubeV = Mathf.RoundToInt((Mathf.Sqrt(3) / 3 * cartesianCoordinate.x - 1.0f / 3 * cartesianCoordinate.z) / hexSize);
+            var cubeL = Mathf.RoundToInt((2.0f / 3 * cartesianCoordinate.z) / hexSize);
+            var cubeA = Mathf.RoundToInt(-cubeV - cubeL);
 
             //Debug.Log($"WorldPosition {cartesianCoordinate} converted to cube {new Vector3(cubeX, cubeY, cubeZ)}");
 
-            return (cubeX, cubeY, cubeZ);
+            return (cubeV, cubeA, cubeL);
         }
     }
 }

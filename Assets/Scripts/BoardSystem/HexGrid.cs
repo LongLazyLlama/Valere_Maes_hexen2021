@@ -13,6 +13,8 @@ namespace BoardSystem
         public BidirectionalDictionary<TPosition, (int v, int a, int l)> Positions
             = new BidirectionalDictionary<TPosition, (int v, int a, int l)>();
 
+        public List<Vector3> CubeCoordinates = new List<Vector3>();
+
         //Creates a new hexgrid.
         public HexGrid(int range)
         {
@@ -22,8 +24,6 @@ namespace BoardSystem
         //Generates the cubeCoordinates for the grid.
         public List<Vector3> GenerateCubeCoordinates()
         {
-            List<Vector3> cubeCoordinates = new List<Vector3>();
-
             for (int v = -GridSize; v <= GridSize; v++)
             {
                 for (int a = Mathf.Max(-GridSize, -v - GridSize); a <= Mathf.Min(GridSize, -v + GridSize); a++)
@@ -31,10 +31,10 @@ namespace BoardSystem
                     var l = -v - a;
 
                     var cubeCoordinate = new Vector3(v, a, l);
-                    cubeCoordinates.Add(cubeCoordinate);
+                    CubeCoordinates.Add(cubeCoordinate);
                 }
             }
-            return cubeCoordinates;
+            return CubeCoordinates;
         }
 
         //Takes a position or cubeCoordinate from the dictionary.

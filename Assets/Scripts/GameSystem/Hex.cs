@@ -57,7 +57,8 @@ namespace GameSystem
                 GameObject droppedCard = eventData.pointerDrag;
                 droppedCard.TryGetComponent<CardView>(out CardView cardView);
 
-                GameLoop.gameLoop.DeselectIsolated(cardView.CardType, this);
+                GameLoop.gameLoop.DeselectIsolated();
+                GameLoop.gameLoop.DeselectValidPositions(cardView.CardType);
                 GameLoop.gameLoop.ExecuteCard(cardView.CardType, this);
 
                 cardView.CardUsed = true;
@@ -67,10 +68,12 @@ namespace GameSystem
         public void OnPointerEnter(PointerEventData eventData)
         {
             GameObject card = eventData.pointerDrag;
+            GameLoop.gameLoop.DeselectIsolated();
 
             if (!_isHighlighted && card != null)
             {
                 card.TryGetComponent<CardView>(out CardView cardView);
+
                 GameLoop.gameLoop.SelectValidPositions(cardView.CardType);
 
                 //Debug.Log("on hex");
@@ -80,6 +83,7 @@ namespace GameSystem
                 card.TryGetComponent<CardView>(out CardView cardView);
 
                 GameLoop.gameLoop.DeselectValidPositions(cardView.CardType);
+
                 GameLoop.gameLoop.SelectIsolated(cardView.CardType, this);
 
                 //Debug.Log("on highlighted hex");

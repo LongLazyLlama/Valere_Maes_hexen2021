@@ -18,7 +18,8 @@ namespace HexSystem
         private MultiValueDictionary<CardType, IMove<TPosition>> _moves = 
             new MultiValueDictionary<CardType, IMove<TPosition>>();
 
-        private List<TPosition> _isolatedHexes = default;
+        public List<TPosition> _isolatedHexes = default;
+        public List<TPosition> _targetHexes = default;
 
         private Board<Piece<TPosition>, TPosition> _board;
         private HexGrid<TPosition> _hexgrid;
@@ -77,13 +78,13 @@ namespace HexSystem
                         .NorthWest(1)
                         .CollectValidPositions()));
 
-            Debug.Log($"Moveset dictionary now contains {_moves.Count} movesets.");
+            //Debug.Log($"Moveset dictionary now contains {_moves.Count} movesets.");
 
             if (_moves.TryGetValue(CardType.Swipe, out var moves))
             {
                 var movecount = ValidPositionsFor(playerPiece, CardType.Swipe).Count;
 
-                Debug.Log($"Swipe moveset now contains {movecount} moves.");
+                //Debug.Log($"Swipe moveset now contains {movecount} moves.");
             }
         }
 
@@ -114,19 +115,19 @@ namespace HexSystem
             else if (cardType == CardType.Slash || cardType == CardType.Pushback)
             {
                 //Find all hexes in the direction of the card in comparison to the player.
-                _isolatedHexes = new PositionHelper<TPosition>(_board, _hexgrid, piece)
+                (_isolatedHexes, _targetHexes) = new PositionHelper<TPosition>(_board, _hexgrid, piece)
                     .CollectIsolatedPositions(maxSteps, mousePosHex, true);
-
-                return _isolatedHexes;
             }
             else
             {
                 //Find all hexes in the direction of the card in comparison to the player.
                 _isolatedHexes = new PositionHelper<TPosition>(_board, _hexgrid, piece)
-                    .CollectIsolatedPositions(maxSteps, mousePosHex, false);
-
-                return _isolatedHexes;
+                    .CollectIsolatedPositions(maxSteps, mousePosHex, false).Item1;
             }
+
+            Debug.Log($"Card of cardtype {cardType} has currently isolated {_isolatedHexes.Count} hexes.");
+
+            return _isolatedHexes;
         }
 
         private int GetMaxRange(List<TPosition> positions)
@@ -155,13 +156,13 @@ namespace HexSystem
 
         public void ExecuteCard(Piece<TPosition> piece, TPosition position, CardType cardType)
         {
-            //neemt alle mogelijke moves.
+            //Checks if the hex you dropped a card on is within the validpositions.
             var move = _moves[cardType]
                 .Where(m => m.CanExecute(piece))
                 .Where(m => m.Positions(piece).Contains(position))
                 .First();
 
-            move.Execute(piece, position, _isolatedHexes, cardType);
+            move.Execute(piece, position, _isolatedHexes, _targetHexes, cardType);
         }
     }
 }

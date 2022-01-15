@@ -5,6 +5,7 @@ using HexSystem;
 using BoardSystem;
 using CardSystem;
 using System;
+using Random = UnityEngine.Random;
 
 namespace GameSystem
 {
@@ -12,6 +13,8 @@ namespace GameSystem
     {
         [SerializeField]
         private GameObject _hexPrefab;
+        [SerializeField]
+        private GameObject _piecePrefab;
         [SerializeField]
         private CoordinateConverter _coordinateConverter;
 
@@ -22,6 +25,8 @@ namespace GameSystem
 
         [SerializeField]
         private int _currentPlayerID = 1;
+        [SerializeField][Range(1, 50)]
+        private int _enemyCount = 10;
         [SerializeField]
         private float _hexSize = 2.0f;
         [SerializeField][Range(1, 20)]
@@ -38,11 +43,13 @@ namespace GameSystem
                 gameLoop = this;
             }
 
-            var deck = new DeckManager();
             var board = new Board<Piece<Hex>, Hex>();
             var grid = new HexGrid<Hex>(_gridSize);
 
+            DeleteHexField();
             GenerateHexField(grid);
+            GenerateEnemies(grid);
+
             ConnectPiece(board, grid);
             GetPlayerPiece(board, grid, out var playerPiece);
 
@@ -66,6 +73,36 @@ namespace GameSystem
                 //instantiate a hex on every cartesian coordinate and connects it to its coordinate.
                 CreateHex(cartesianCoordinate, out Hex hex);
                 ConnectHex(grid, cubeCoordinate, hex);
+            }
+        }
+        private void GenerateEnemies(HexGrid<Hex> grid)
+        {
+            List<int> usedPositions = new List<int>();
+
+            int playerpos = grid.CubeCoordinates.IndexOf(new Vector3(0,0,0));
+            usedPositions.Add(playerpos);
+
+            if (_enemyCount > grid.CubeCoordinates.Count)
+                _enemyCount = grid.CubeCoordinates.Count - usedPositions.Count;
+
+
+            for (int i = 0; i < _enemyCount; i++)
+            {
+                var randomEnemyPos = Random.Range(0, grid.CubeCoordinates.Count);
+
+                if (!usedPositions.Contains(randomEnemyPos))
+                {
+                    var worldPos = _coordinateConverter.CubeCoordinatesToCartesian
+                        (grid.CubeCoordinates[randomEnemyPos], _hexSize);
+
+                    Instantiate(_piecePrefab, worldPos, Quaternion.identity);
+
+                    usedPositions.Add(randomEnemyPos);
+                }
+                else
+                {
+                    i--;
+                }
             }
         }
 
@@ -114,7 +151,7 @@ namespace GameSystem
                 board.TryGetPiece(hex, out var piece);
                 playerPiece = piece;
 
-                Debug.Log($"Selected piece player ID: {piece.PlayerID} on worldposition {_playerPos} and cubecoordinate {playerCubePos}");
+                //Debug.Log($"Selected piece player ID: {piece.PlayerID} on worldposition {_playerPos} and cubecoordinate {playerCubePos}");
             }
             else
             {
@@ -140,12 +177,8 @@ namespace GameSystem
             => SelectValidPositions(_playerPiece, cardType);
         public void DeselectValidPositions(CardType cardType)
             => DeselectValidPositions(_playerPiece, cardType);
-
         public void SelectIsolated(CardType cardType, Hex hex)
             => SelectIsolated(_playerPiece, cardType, hex);
-        public void DeselectIsolated(CardType cardType, Hex hex)
-            => DeselectIsolated(_playerPiece, cardType, hex);
-
         public void ExecuteCard(CardType cardType, Hex hex)
             => _moveManager.ExecuteCard(_playerPiece, hex, cardType);
 
@@ -169,12 +202,13 @@ namespace GameSystem
             foreach (var h in hexes)
                 h.Highlight = true;
         }
-        private void DeselectIsolated(Piece<Hex> piece, CardType cardtype, Hex hex)
+        public void DeselectIsolated()
         {
             //Reselect all isolated tiles.
-            var hexes = _moveManager.IsolatedPositionsFor(piece, cardtype, hex);
-            foreach (var h in hexes)
-                h.Highlight = false;
+            var hexes = _moveManager._isolatedHexes;
+            if (hexes != null)
+                foreach (var h in hexes)
+                    h.Highlight = false;
         }
     }
 }

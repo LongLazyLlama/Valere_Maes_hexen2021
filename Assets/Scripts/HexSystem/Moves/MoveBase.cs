@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BoardSystem;
 using CardSystem;
+using UnityEngine;
 
 namespace HexSystem.Moves
 {
@@ -24,7 +25,8 @@ namespace HexSystem.Moves
         public bool CanExecute(Piece<TPosition> piece)
             => true;
 
-        public void Execute(Piece<TPosition> piece, TPosition position , List<TPosition> isolatedPositions, CardType cardType)
+        public void Execute(Piece<TPosition> piece, TPosition mouseHexPosition, 
+            List<TPosition> isolatedPositions, List<TPosition> targetPositions, CardType cardType)
         {
             //Takes the old position.
             if (!Board.TryGetPosition(piece, out var oldPosition))
@@ -34,46 +36,47 @@ namespace HexSystem.Moves
             {
                 case CardType.Pushback :
                 {
-                    foreach (var pos in isolatedPositions)
+                    for (int i = 0; i < isolatedPositions.Count; i++)
                     {
-                        //If there is a piece on the new position, take it.
-                        var pieceTaken = Board.TryGetPiece(pos, out var toPiece);
+                        if (targetPositions[i] != null)
+                        {
+                            var pieceWithinRange = Board.TryGetPiece(isolatedPositions[i], out var toPiece);
+                            var pieceOnDestination = Board.TryGetPiece(targetPositions[i], out var p);
 
-
-                        //if (pieceTaken)
-                        //    Board.Move(toPiece);
+                            if (pieceWithinRange && !pieceOnDestination)
+                                Board.Move(toPiece, targetPositions[i]);
+                        }
                     }
-
                     break;
-
                 }
                 case CardType.Teleport :
                 {
-                    Board.Move(piece, position);
+                    Board.Move(piece, mouseHexPosition);
                     break;
                 }
                 case CardType.Slash :
                 {
-                    foreach (var pos in isolatedPositions)
-                    {
-                        //If there is a piece on the new position, take it.
-                        var pieceTaken = Board.TryGetPiece(pos, out var toPiece);
-                        if (pieceTaken)
-                            Board.Take(toPiece);
-                    }
+                    TakeEnemiesOnIsolated(isolatedPositions);
                     break;
                 }
                 case CardType.Swipe :
                 {
-                    foreach (var pos in isolatedPositions)
-                    {
-                        //If there is a piece on the new position, take it.
-                        var pieceTaken = Board.TryGetPiece(pos, out var toPiece);
-                        if (pieceTaken)
-                            Board.Take(toPiece);
-                    }
+                    TakeEnemiesOnIsolated(isolatedPositions);
                     break;
                 }
+            }
+
+            Debug.Log($"Card {cardType} was executed.");
+        }
+
+        private void TakeEnemiesOnIsolated(List<TPosition> isolatedPositions)
+        {
+            foreach (var pos in isolatedPositions)
+            {
+                //If there is a piece on the new position, take it.
+                var pieceTaken = Board.TryGetPiece(pos, out var toPiece);
+                if (pieceTaken)
+                    Board.Take(toPiece);
             }
         }
 

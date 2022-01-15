@@ -12,7 +12,8 @@ namespace HexSystem
     {
         bool CanExecute(Piece<TPosition> piece);
 
-        void Execute(Piece<TPosition> piece, TPosition position, List<TPosition> isolatedPositions, CardType cardType);
+        void Execute(Piece<TPosition> piece, TPosition position, List<TPosition> isolatedPositions, 
+            List<TPosition> targetPositions, CardType cardType);
 
         List<TPosition> Positions(Piece<TPosition> piece);
     }

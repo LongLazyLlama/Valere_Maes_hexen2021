@@ -27,6 +27,7 @@ namespace HexSystem
 
         private List<TPosition> _validPositions = new List<TPosition>();
         private List<TPosition> _isolatedPositions = new List<TPosition>();
+        private List<TPosition> _targetPositions = new List<TPosition>();
 
         private bool _isolatedDirection;
 
@@ -111,9 +112,9 @@ namespace HexSystem
 
             //Gets the cubecoordinate of the neigbouring hex.
             _hexGrid.TryGetPositionAt(
-                currentCoordinates.v + vOffset,
-                currentCoordinates.a + aOffset,
-                currentCoordinates.l + lOffset,
+                nextCoordinateV,
+                nextCoordinateA,
+                nextCoordinateL,
                 out TPosition nextPosition);
 
             //Gets all tiles in a direction according to the max amount of steps (range).
@@ -124,30 +125,9 @@ namespace HexSystem
                 //Is it trying to collect the isolated positions or all valid positions.
                 if (isolatedSelection)
                 {
-                    _hexGrid.TryGetCubeCoordinateAt(nextPosition, out var nextPos);
-                    _hexGrid.TryGetCubeCoordinateAt(mouseHexPos, out var mousePos);
-                    _hexGrid.TryGetCubeCoordinateAt(currentPosition, out var playerPos);
-
-                    if (nextPos == mousePos && !_isolatedDirection)
-                    {
-                        //Set all values back to default (steps -1 because it still goes up by one at the end of the loop = 0).
-                        steps = -1;
-                        nextCoordinateV = currentCoordinates.v;
-                        nextCoordinateA = currentCoordinates.a;
-                        nextCoordinateL = currentCoordinates.l;
-
-                        //The hex with the mousepointer ontop is in this direction.
-                        _isolatedDirection = true;
-                    }
-                    if (usesNeighbours && _isolatedDirection)
-                    {
-                        GetNeighbouringHexes(playerPos, currentDirectionOffset);
-                    }
-
-                    if (_isolatedDirection)
-                    {
-                        _isolatedPositions.Add(nextPosition);
-                    }
+                    CollectIsolated(usesNeighbours, mouseHexPos, currentPosition, 
+                        currentCoordinates, currentDirectionOffset, ref nextCoordinateV, 
+                        ref nextCoordinateA, ref nextCoordinateL, nextPosition, ref steps);
                 }
                 else
                 {
@@ -165,23 +145,46 @@ namespace HexSystem
                     out nextPosition);
 
                 steps++;
-
-                ////If there is a piece on that tile.
-                //if (_board.TryGetPiece(nextPosition, out var nextPiece))
-                //{
-                //    if (nextPiece.PlayerID != _piece.PlayerID)
-                //        _validPositions.Add(nextPosition);
-
-                //    steps++;
-                //}
-                //else
             }
 
             _isolatedDirection = false;
             return this;
         }
 
-        public List<TPosition> CollectIsolatedPositions(int maxSteps, TPosition hex, bool usesNeighbours)
+        private void CollectIsolated(bool usesNeighbours, TPosition mouseHexPos, TPosition currentPosition, 
+            (int v, int a, int l) currentCoordinates, (int, int, int) currentDirectionOffset, 
+            ref int nextCoordinateV, ref int nextCoordinateA, ref int nextCoordinateL, 
+            TPosition nextPosition, ref int steps)
+        {
+            _hexGrid.TryGetCubeCoordinateAt(nextPosition, out var nextPos);
+            _hexGrid.TryGetCubeCoordinateAt(mouseHexPos, out var mousePos);
+            _hexGrid.TryGetCubeCoordinateAt(currentPosition, out var playerPos);
+
+            if (_isolatedDirection)
+            {
+                _isolatedPositions.Add(nextPosition);
+                //Debug.Log($"Iso 1 triggerd, isolated positions now counts {_isolatedPositions.Count} hexes.");
+            }
+
+            if (usesNeighbours && _isolatedDirection)
+            {
+                GetNeighbouringHexes(playerPos, currentDirectionOffset, 1, 1);
+            }
+
+            if (nextPos == mousePos && !_isolatedDirection)
+            {
+                //Set all values back to default (steps -1 because it still goes up by one at the end of the loop = 0).
+                steps = -1;
+                nextCoordinateV = currentCoordinates.v;
+                nextCoordinateA = currentCoordinates.a;
+                nextCoordinateL = currentCoordinates.l;
+
+                //The hex with the mousepointer ontop is in this direction.
+                _isolatedDirection = true;
+            }
+        }
+
+        public (List<TPosition>, List<TPosition>) CollectIsolatedPositions(int maxSteps, TPosition hex, bool usesNeighbours)
         {
             NorthEast(maxSteps, true, usesNeighbours, hex);
             East(maxSteps, true, usesNeighbours, hex);
@@ -190,47 +193,57 @@ namespace HexSystem
             West(maxSteps, true, usesNeighbours, hex);
             NorthWest(maxSteps, true, usesNeighbours, hex);
 
-            return _isolatedPositions;
+            return (_isolatedPositions, _targetPositions);
         }
         public List<TPosition> CollectValidPositions()
         {
             return _validPositions;
         }
 
-        public void GetNeighbouringHexes((int, int, int) playerPosition, (int, int, int) currentDirection)
+        public void GetNeighbouringHexes((int, int, int) playerPosition, (int, int, int) currentDirection, 
+            int neighbourOffset, int maxSteps)
         {
+            //Get the index of the current direction the mouse is in.
             var mouseDirIndex = _hexDirections.FindIndex((m) => m == currentDirection);
 
             //Get previous Neighbour.
-            var previousIndex = mouseDirIndex - 1;
-            if (previousIndex < 0)
-                previousIndex = 5;
-
-            var previousNeighbourV = playerPosition.Item1 + _hexDirections[previousIndex].Item1;
-            var previousNeighbourA = playerPosition.Item2 + _hexDirections[previousIndex].Item2;
-            var previousNeighbourL = playerPosition.Item3 + _hexDirections[previousIndex].Item3;
-
-            _hexGrid.TryGetPositionAt(previousNeighbourV, previousNeighbourA, previousNeighbourL, out var previousNeighbour);
-
-            if (previousNeighbour != null)
-            {
-                _isolatedPositions.Add(previousNeighbour);
-            }
-
+            var previousIndex = mouseDirIndex - neighbourOffset;
+            GetNeighbour(_isolatedPositions, playerPosition, previousIndex, 1, maxSteps);
             //Get next Neighbour.
-            var nextIndex = mouseDirIndex + 1;
-            if (nextIndex > 5)
-                nextIndex = 0;
+            var nextIndex = mouseDirIndex + neighbourOffset;
+            GetNeighbour(_isolatedPositions, playerPosition, nextIndex, 1, maxSteps);
 
-            var nextNeighbourV = playerPosition.Item1 + _hexDirections[nextIndex].Item1;
-            var nextNeighbourA = playerPosition.Item2 + _hexDirections[nextIndex].Item2;
-            var nextNeighbourL = playerPosition.Item3 + _hexDirections[nextIndex].Item3;
+            //Get targetPositions for the pushcard.
+            var currentTargetIndex = mouseDirIndex;
+            GetNeighbour(_targetPositions, playerPosition, currentTargetIndex, 2, maxSteps);
+            var previousTargetIndex = mouseDirIndex - neighbourOffset;
+            GetNeighbour(_targetPositions, playerPosition, previousTargetIndex, 2, maxSteps);
+            var nextTargetIndex = mouseDirIndex + neighbourOffset;
+            GetNeighbour(_targetPositions, playerPosition, nextTargetIndex, 2, maxSteps);
+        }
 
-            _hexGrid.TryGetPositionAt(nextNeighbourV, nextNeighbourA, nextNeighbourL, out var nextNeighbour);
+        private void GetNeighbour(List<TPosition> positions , (int, int, int) playerPosition, 
+            int Index, int minSteps, int maxSteps)
+        {
+            //Keeps the index within the 6 possible directions
+            if (Index < 0)
+                Index += 6;
 
-            if (nextNeighbour != null)
+            if (Index > 5)
+                Index += -6;
+
+            if (minSteps > maxSteps)
+                maxSteps = minSteps;
+
+            for (int i = minSteps; i <= maxSteps; i++)
             {
-                _isolatedPositions.Add(nextNeighbour);
+                var neighbourV = playerPosition.Item1 + (_hexDirections[Index].Item1 * i);
+                var neighbourA = playerPosition.Item2 + (_hexDirections[Index].Item2 * i);
+                var neighbourL = playerPosition.Item3 + (_hexDirections[Index].Item3 * i);
+
+                _hexGrid.TryGetPositionAt(neighbourV, neighbourA, neighbourL, out var neighbouringHex);
+
+                positions.Add(neighbouringHex);
             }
         }
 

@@ -11,7 +11,7 @@ public class DeckManager : MonoBehaviour
     [HideInInspector]
     public static DeckManager Deck;
 
-    public DeckManager() 
+    public void Start() 
     {
         if (Deck == null)
         {
