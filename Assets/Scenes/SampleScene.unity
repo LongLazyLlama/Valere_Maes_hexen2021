@@ -5779,13 +5779,13 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1479553888}
     m_Modifications:
-    - target: {fileID: 578764175241707171, guid: 330a6c59f6945bf458041575c7e62750, type: 3}
-      propertyPath: _playerID
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1874071713687923480, guid: 330a6c59f6945bf458041575c7e62750, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 1874071713687923480, guid: 330a6c59f6945bf458041575c7e62750, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1874071713687923480, guid: 330a6c59f6945bf458041575c7e62750, type: 3}
       propertyPath: m_TagString
@@ -6826,7 +6826,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cf3760f0d8d8ea4d9f7c0618aec20bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cardsInDeck: 10
+  _cardsInDeck: 15
   CardPrefabs:
   - {fileID: 8351777813626895503, guid: 1a4b416da7b3ae243b994a15328c3ada, type: 3}
   - {fileID: 181860612936592011, guid: 45ae5a07faf0e7a4592160673c96c7d8, type: 3}
