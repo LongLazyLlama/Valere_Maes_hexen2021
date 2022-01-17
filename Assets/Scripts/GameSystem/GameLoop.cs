@@ -30,8 +30,6 @@ namespace GameSystem
         private bool _spawnPlayerRandomly;
 
         [Space]
-        [SerializeField]
-        private int _currentPlayerID = 1;
         [SerializeField][Range(1, 50)]
         private int _enemyCount = 10;
         [SerializeField]
@@ -192,6 +190,7 @@ namespace GameSystem
         {
             var hexObject = Instantiate(_hexPrefab, cartesianCoordinate, _hexPrefab.transform.rotation, transform);
             hex = hexObject.GetComponentInChildren<Hex>();
+            //hex.Model = hex;
         }
 
         public void SelectValidPositions(CardType cardType)

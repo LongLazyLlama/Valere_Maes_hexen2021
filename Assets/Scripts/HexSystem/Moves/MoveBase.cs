@@ -64,9 +64,39 @@ namespace HexSystem.Moves
                     TakeEnemiesOnIsolated(isolatedPositions);
                     break;
                 }
+                case CardType.Bomb :
+                {
+                    DestroyHexes(isolatedPositions);
+                    break;
+                }
             }
 
             Debug.Log($"Card {cardType} was executed.");
+        }
+
+        private void DestroyHexes(List<TPosition> isolatedPositions)
+        {
+            foreach (var pos in isolatedPositions)
+            {
+                if (pos != null)
+                {
+                    var pieceTaken = Board.TryGetPiece(pos, out var toPiece);
+
+                    //If there is a piece on a hex, remove it.
+                    if (pieceTaken)
+                    {
+                        if (toPiece.PlayerID == 1)
+                        {
+                            Debug.Log("Player taken.");
+                        }
+                        Board.Take(toPiece);
+                    }
+
+                    //If the hex on cubecoordinate exists in the dictionary, remove the hex.
+                    if (HexGrid.TryGetCubeCoordinateAt(pos, out _))
+                        HexGrid.Remove(pos);
+                }
+            }
         }
 
         private void TakeEnemiesOnIsolated(List<TPosition> isolatedPositions)

@@ -8,23 +8,32 @@ using UnityEngine.EventSystems;
 
 namespace GameSystem
 {
-    //Saves the hex in eventargs.
-    public class HexEventArgs : EventArgs
-    {
-        public Hex Hex;
-
-        public HexEventArgs(Hex hex)
-        {
-            Hex = hex;
-        }
-    }
-
     public class Hex : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPosition
     {
         [SerializeField]
         private UnityEvent OnActivate;
         [SerializeField]
         private UnityEvent OnDeactivate;
+
+        //private Hex model;
+        //public Hex Model
+        //{
+        //    get => model;
+        //    set
+        //    {
+        //        if (model != null)
+        //        {
+        //            //model.HexRemoved -= OnHexRemoved;
+        //        }
+
+        //        model = value;
+
+        //        if (model != null)
+        //        {
+        //            //model.HexRemoved += OnHexRemoved;
+        //        }
+        //    }
+        //}
 
         private bool _isHighlighted;
         public bool Highlight
@@ -89,5 +98,10 @@ namespace GameSystem
                 //Debug.Log("on highlighted hex");
             }
         }
+
+        //internal void OnHexRemoved(object sender, HexEventArgs<Hex> e)
+        //{
+        //    gameObject.SetActive(false);
+        //}
     }
 }

@@ -38,6 +38,8 @@ namespace HexSystem
             _board.PiecePlaced += (s, e) => e.Piece.PlaceAt(e.AtPosition);
             _board.PieceTaken += (s, e) => e.Piece.TakeFrom(e.FromPosition);
 
+            //_hexgrid.HexRemoved += (s, e) => ;
+
             //Creates the movesets for each card.
             _moves.Add(CardType.Swipe,
                 new ConfigurableMove<TPosition>(board, grid, (b, h, p) 
@@ -78,14 +80,21 @@ namespace HexSystem
                         .NorthWest(1)
                         .CollectValidPositions()));
 
+            _moves.Add(CardType.Bomb,
+                new ConfigurableMove<TPosition>(board, grid, (b, h, p)
+                => new PositionHelper<TPosition>(b, h, p)
+                        .AnyEmpty()
+                        .AnyPiece()
+                        .CollectValidPositions()));
+
             //Debug.Log($"Moveset dictionary now contains {_moves.Count} movesets.");
 
-            if (_moves.TryGetValue(CardType.Swipe, out var moves))
-            {
-                var movecount = ValidPositionsFor(playerPiece, CardType.Swipe).Count;
+            //if (_moves.TryGetValue(CardType.Swipe, out var moves))
+            //{
+            //    var movecount = ValidPositionsFor(playerPiece, CardType.Swipe).Count;
 
-                //Debug.Log($"Swipe moveset now contains {movecount} moves.");
-            }
+            //    //Debug.Log($"Swipe moveset now contains {movecount} moves.");
+            //}
         }
 
         //Returns a list of valid positions for a Card.
@@ -114,18 +123,22 @@ namespace HexSystem
             }
             else if (cardType == CardType.Slash || cardType == CardType.Pushback)
             {
-                //Find all hexes in the direction of the card in comparison to the player.
                 (_isolatedHexes, _targetHexes) = new PositionHelper<TPosition>(_board, _hexgrid, piece)
-                    .CollectIsolatedPositions(maxSteps, mousePosHex, true);
+                    .CollectIsolatedPositions(maxSteps, mousePosHex, true, false);
+            }
+            else if (cardType == CardType.Bomb)
+            {
+                _isolatedHexes = new PositionHelper<TPosition>(_board, _hexgrid, piece)
+                    .CollectIsolatedPositions(maxSteps, mousePosHex, false, true).Item1;
             }
             else
             {
                 //Find all hexes in the direction of the card in comparison to the player.
                 _isolatedHexes = new PositionHelper<TPosition>(_board, _hexgrid, piece)
-                    .CollectIsolatedPositions(maxSteps, mousePosHex, false).Item1;
+                    .CollectIsolatedPositions(maxSteps, mousePosHex, false, false).Item1;
             }
 
-            Debug.Log($"Card of cardtype {cardType} has currently isolated {_isolatedHexes.Count} hexes.");
+            //Debug.Log($"Card of cardtype {cardType} has currently isolated {_isolatedHexes.Count} hexes.");
 
             return _isolatedHexes;
         }

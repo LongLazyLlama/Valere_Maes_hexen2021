@@ -123,7 +123,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2058772070208170320}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 50793c3dc61b1e44cae5412cd0d1be3a, type: 3}
+  m_Script: {fileID: 11500000, guid: b74fe0e7bbe3d2744b3459e2ceca5f0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   OnActivate:
@@ -139,7 +139,7 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 1
+          m_BoolArgument: 0
         m_CallState: 2
   OnDeactivate:
     m_PersistentCalls:
