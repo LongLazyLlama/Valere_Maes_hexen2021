@@ -76,7 +76,7 @@ namespace GameSystem
             var pieces = FindObjectsOfType<PieceView>();
             foreach (PieceView piece in pieces)
             {
-                piece.gameObject.SetActive(false);
+                Destroy(piece.gameObject);
             }
         }
 
@@ -164,7 +164,6 @@ namespace GameSystem
                 if (grid.TryGetPositionAt(v, a, l, out Hex hex))
                 {
                     board.Place(piece, hex);
-                    //Debug.Log($"Piece placed on hex {(v, a, l)}");
                 }
             }
         }
