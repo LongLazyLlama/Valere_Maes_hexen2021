@@ -64,6 +64,7 @@ namespace GameSystem
 
         public event EventHandler<ClickEventArgs> Clicked;
 
+        //Click stays for future piece selection/switching between pieces
         public void OnPointerClick(PointerEventData eventData)
         {
             Debug.Log($"clicked {gameObject.name}");

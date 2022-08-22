@@ -88,5 +88,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d9c1e53e4d449c4fbd47abfd4dfbf20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cardType: 0
+  CardType: 0
   _offsetFromMouse: {x: 0, y: -100, z: 0}
+  CardUsed: 0

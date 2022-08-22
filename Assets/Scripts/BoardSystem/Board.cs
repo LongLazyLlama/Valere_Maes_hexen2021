@@ -6,10 +6,7 @@ using UnityEngine;
 
 namespace BoardSystem
 {
-    //Eventargs stores event data, in this case when the pawn does something, it saves its position and piece
-    //
-    //TPiece => TPlayer because instead of needing info about the clicked piece, you need info about the player
-    //Unlike the pieces in chess, the player in hexen does NOT need to be clicked before you play changing some of the code.
+    //Eventargs stores event data, in this case when a piece does something, it saves its position and piece
     public class PiecePlacedEventArgs<TPiece, TPosition> : EventArgs
     {
         public TPosition AtPosition { get; }

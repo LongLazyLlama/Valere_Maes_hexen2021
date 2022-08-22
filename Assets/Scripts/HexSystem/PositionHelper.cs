@@ -68,7 +68,7 @@ namespace HexSystem
             {
                 _hexGrid.TryGetPositionAt(position.v, position.a, position.l, out TPosition hex);
 
-                if (_board.TryGetPiece(hex, out Piece<TPosition> piece) && piece.PlayerID != 1)
+                if (_board.TryGetPiece(hex, out Piece<TPosition> piece))
                 {
                     _validPositions.Add(hex);
                 }
@@ -184,23 +184,43 @@ namespace HexSystem
             }
         }
 
-        public (List<TPosition>, List<TPosition>) CollectIsolatedPositions(int maxSteps, TPosition hex, bool usesNeighbours)
+        public (List<TPosition>, List<TPosition>) CollectIsolatedPositions(int maxSteps, 
+            TPosition hex, bool usesNeighbours, bool zoneAroundMouse)
         {
-            NorthEast(maxSteps, true, usesNeighbours, hex);
-            East(maxSteps, true, usesNeighbours, hex);
-            SouthEast(maxSteps, true, usesNeighbours, hex);
-            SouthWest(maxSteps, true, usesNeighbours, hex);
-            West(maxSteps, true, usesNeighbours, hex);
-            NorthWest(maxSteps, true, usesNeighbours, hex);
+            if (zoneAroundMouse)
+            {
+                CollectTilesAroundMouse(hex);
+                _isolatedPositions.Add(hex);
+            }
+            else
+            {
+                NorthEast(maxSteps, true, usesNeighbours, hex);
+                East(maxSteps, true, usesNeighbours, hex);
+                SouthEast(maxSteps, true, usesNeighbours, hex);
+                SouthWest(maxSteps, true, usesNeighbours, hex);
+                West(maxSteps, true, usesNeighbours, hex);
+                NorthWest(maxSteps, true, usesNeighbours, hex);
+            }
 
             return (_isolatedPositions, _targetPositions);
         }
+
         public List<TPosition> CollectValidPositions()
         {
             return _validPositions;
         }
 
-        public void GetNeighbouringHexes((int, int, int) playerPosition, (int, int, int) currentDirection, 
+        public void CollectTilesAroundMouse(TPosition mouseHexPos)
+        {
+            _hexGrid.TryGetCubeCoordinateAt(mouseHexPos, out (int, int, int) cubeCoord);
+
+            for (int i = 0; i < _hexDirections.Count; i++)
+            {
+                GetNeighbour(_isolatedPositions, cubeCoord, i, 1, 1);
+            }
+        }
+
+        public void GetNeighbouringHexes((int, int, int) position, (int, int, int) currentDirection, 
             int neighbourOffset, int maxSteps)
         {
             //Get the index of the current direction the mouse is in.
@@ -208,18 +228,18 @@ namespace HexSystem
 
             //Get previous Neighbour.
             var previousIndex = mouseDirIndex - neighbourOffset;
-            GetNeighbour(_isolatedPositions, playerPosition, previousIndex, 1, maxSteps);
+            GetNeighbour(_isolatedPositions, position, previousIndex, 1, maxSteps);
             //Get next Neighbour.
             var nextIndex = mouseDirIndex + neighbourOffset;
-            GetNeighbour(_isolatedPositions, playerPosition, nextIndex, 1, maxSteps);
+            GetNeighbour(_isolatedPositions, position, nextIndex, 1, maxSteps);
 
             //Get targetPositions for the pushcard.
             var currentTargetIndex = mouseDirIndex;
-            GetNeighbour(_targetPositions, playerPosition, currentTargetIndex, 2, maxSteps);
+            GetNeighbour(_targetPositions, position, currentTargetIndex, 2, maxSteps);
             var previousTargetIndex = mouseDirIndex - neighbourOffset;
-            GetNeighbour(_targetPositions, playerPosition, previousTargetIndex, 2, maxSteps);
+            GetNeighbour(_targetPositions, position, previousTargetIndex, 2, maxSteps);
             var nextTargetIndex = mouseDirIndex + neighbourOffset;
-            GetNeighbour(_targetPositions, playerPosition, nextTargetIndex, 2, maxSteps);
+            GetNeighbour(_targetPositions, position, nextTargetIndex, 2, maxSteps);
         }
 
         private void GetNeighbour(List<TPosition> positions , (int, int, int) playerPosition, 

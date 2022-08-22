@@ -4,14 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CardSystem
+namespace Assets.Scripts.GameSystem.GameStates
 {
-    public enum CardType
+    class EndscreenGameState
     {
-        Swipe,
-        Teleport,
-        Slash,
-        Pushback,
-        Bomb
     }
 }

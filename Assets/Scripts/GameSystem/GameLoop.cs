@@ -30,8 +30,6 @@ namespace GameSystem
         private bool _spawnPlayerRandomly;
 
         [Space]
-        [SerializeField]
-        private int _currentPlayerID = 1;
         [SerializeField][Range(1, 50)]
         private int _enemyCount = 10;
         [SerializeField]
@@ -78,7 +76,7 @@ namespace GameSystem
             var pieces = FindObjectsOfType<PieceView>();
             foreach (PieceView piece in pieces)
             {
-                piece.gameObject.SetActive(false);
+                Destroy(piece.gameObject);
             }
         }
 
@@ -166,7 +164,6 @@ namespace GameSystem
                 if (grid.TryGetPositionAt(v, a, l, out Hex hex))
                 {
                     board.Place(piece, hex);
-                    //Debug.Log($"Piece placed on hex {(v, a, l)}");
                 }
             }
         }
@@ -192,6 +189,7 @@ namespace GameSystem
         {
             var hexObject = Instantiate(_hexPrefab, cartesianCoordinate, _hexPrefab.transform.rotation, transform);
             hex = hexObject.GetComponentInChildren<Hex>();
+            //hex.Model = hex;
         }
 
         public void SelectValidPositions(CardType cardType)
