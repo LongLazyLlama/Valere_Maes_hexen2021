@@ -15,26 +15,6 @@ namespace GameSystem
         [SerializeField]
         private UnityEvent OnDeactivate;
 
-        //private Hex model;
-        //public Hex Model
-        //{
-        //    get => model;
-        //    set
-        //    {
-        //        if (model != null)
-        //        {
-        //            //model.HexRemoved -= OnHexRemoved;
-        //        }
-
-        //        model = value;
-
-        //        if (model != null)
-        //        {
-        //            //model.HexRemoved += OnHexRemoved;
-        //        }
-        //    }
-        //}
-
         private bool _isHighlighted;
         public bool Highlight
         {
@@ -98,10 +78,5 @@ namespace GameSystem
                 //Debug.Log("on highlighted hex");
             }
         }
-
-        //internal void OnHexRemoved(object sender, HexEventArgs<Hex> e)
-        //{
-        //    gameObject.SetActive(false);
-        //}
     }
 }
