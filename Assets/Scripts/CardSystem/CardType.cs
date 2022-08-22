@@ -12,5 +12,6 @@ namespace CardSystem
         Teleport,
         Slash,
         Pushback,
+        Rain
     }
 }

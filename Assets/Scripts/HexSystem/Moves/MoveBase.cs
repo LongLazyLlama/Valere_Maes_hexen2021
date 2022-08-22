@@ -28,10 +28,6 @@ namespace HexSystem.Moves
         public void Execute(Piece<TPosition> piece, TPosition mouseHexPosition, 
             List<TPosition> isolatedPositions, List<TPosition> targetPositions, CardType cardType)
         {
-            //Takes the old position.
-            if (!Board.TryGetPosition(piece, out var oldPosition))
-                return;
-
             switch (cardType)
             {
                 case CardType.Pushback :
@@ -64,9 +60,39 @@ namespace HexSystem.Moves
                     TakeEnemiesOnIsolated(isolatedPositions);
                     break;
                 }
+                case CardType.Rain :
+                {
+                    DestroyRandomHexes(3, targetPositions);
+                    break;
+                }
             }
 
             Debug.Log($"Card {cardType} was executed.");
+        }
+
+        private void DestroyRandomHexes(int Amount, List<TPosition> positions)
+        {
+            for (int i = 0; i < Amount; i++)
+            {
+                var randomNumber = UnityEngine.Random.Range(0, positions.Count);
+                var randomPosition = positions[randomNumber];
+                var pieceTaken = Board.TryGetPiece(randomPosition, out var toPiece);
+
+                //If there is a piece on a hex, remove it.
+                if (pieceTaken)
+                {
+                    if (toPiece.PlayerID == 1)
+                    {
+                        Debug.Log("Player taken.");
+                    }
+                    Board.Take(toPiece);
+                }
+
+                positions.RemoveAt(randomNumber);
+
+                HexGrid.RemoveHex(randomPosition);
+                randomPosition.DestroyHex();
+            }
         }
 
         private void TakeEnemiesOnIsolated(List<TPosition> isolatedPositions)

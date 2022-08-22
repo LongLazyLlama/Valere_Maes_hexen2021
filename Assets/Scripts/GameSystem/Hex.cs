@@ -78,5 +78,11 @@ namespace GameSystem
                 //Debug.Log("on highlighted hex");
             }
         }
+
+        public void DestroyHex()
+        {
+            gameObject.SetActive(false);
+        }
+
     }
 }

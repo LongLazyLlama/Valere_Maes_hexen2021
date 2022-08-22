@@ -23,7 +23,7 @@ namespace GameSystem
         [SerializeField]
         private int _playerID;
         [SerializeField]
-        private UnityEvent<bool> OnHighlight;
+        private UnityEvent<bool> OnHighlight = null;
 
         public int PlayerID => _playerID;
 

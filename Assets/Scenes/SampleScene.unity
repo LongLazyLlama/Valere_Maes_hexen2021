@@ -477,7 +477,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1874071713687923480, guid: 330a6c59f6945bf458041575c7e62750, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1874071713687923480, guid: 330a6c59f6945bf458041575c7e62750, type: 3}
       propertyPath: m_TagString
@@ -552,27 +552,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 439355469617444527, guid: 0c8d8c7bb3dd9b945ae3c0e060c5638c, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -112
+      value: -227.6
       objectReference: {fileID: 0}
     - target: {fileID: 2781135793420133143, guid: 0c8d8c7bb3dd9b945ae3c0e060c5638c, type: 3}
       propertyPath: _canvas
       value: 
       objectReference: {fileID: 1842501069}
-    - target: {fileID: 4468590832947821714, guid: 0c8d8c7bb3dd9b945ae3c0e060c5638c, type: 3}
-      propertyPath: CardPrefabs.Array.size
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 4468590832947821714, guid: 0c8d8c7bb3dd9b945ae3c0e060c5638c, type: 3}
-      propertyPath: CardPrefabs.Array.data[4]
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 4957037796480336342, guid: 0c8d8c7bb3dd9b945ae3c0e060c5638c, type: 3}
       propertyPath: _canvas
       value: 
       objectReference: {fileID: 1842501069}
     - target: {fileID: 6101204293553362071, guid: 0c8d8c7bb3dd9b945ae3c0e060c5638c, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 123
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 6339366966927467994, guid: 0c8d8c7bb3dd9b945ae3c0e060c5638c, type: 3}
       propertyPath: _canvas
@@ -580,7 +572,7 @@ PrefabInstance:
       objectReference: {fileID: 1842501069}
     - target: {fileID: 7226760766620636270, guid: 0c8d8c7bb3dd9b945ae3c0e060c5638c, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 350
+      value: 247.3
       objectReference: {fileID: 0}
     - target: {fileID: 7589453832127260186, guid: 0c8d8c7bb3dd9b945ae3c0e060c5638c, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -684,7 +676,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8609061246694387810, guid: 0c8d8c7bb3dd9b945ae3c0e060c5638c, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -342
+      value: -465.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8763818002517759296, guid: 0c8d8c7bb3dd9b945ae3c0e060c5638c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 488.3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0c8d8c7bb3dd9b945ae3c0e060c5638c, type: 3}

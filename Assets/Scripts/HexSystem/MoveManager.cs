@@ -80,6 +80,12 @@ namespace HexSystem
                         .NorthWest(1)
                         .CollectValidPositions()));
 
+            _moves.Add(CardType.Rain,
+               new ConfigurableMove<TPosition>(board, grid, (b, h, p)
+               => new PositionHelper<TPosition>(b, h, p)
+                       .AllHexes()
+                       .CollectValidPositions()));
+
             //Debug.Log($"Moveset dictionary now contains {_moves.Count} movesets.");
 
             //if (_moves.TryGetValue(CardType.Swipe, out var moves))
@@ -119,15 +125,27 @@ namespace HexSystem
                 (_isolatedHexes, _targetHexes) = new PositionHelper<TPosition>(_board, _hexgrid, piece)
                     .CollectIsolatedPositions(maxSteps, mousePosHex, true, false);
             }
-            else
+            else if (cardType == CardType.Swipe)
             {
                 //Find all hexes in the direction of the card in comparison to the player.
                 _isolatedHexes = new PositionHelper<TPosition>(_board, _hexgrid, piece)
                     .CollectIsolatedPositions(maxSteps, mousePosHex, false, false).Item1;
             }
+            else if (cardType == CardType.Rain)
+            {
+                //(_isolatedHexes, _targetHexes) = new PositionHelper<TPosition>(_board, _hexgrid, piece)
+                //                    .CollectIsolatedPositions(maxSteps, mousePosHex, true, false);
+
+                _targetHexes = new PositionHelper<TPosition>(_board, _hexgrid, piece)
+                   .TargetAllHexes();
+
+                validHexes.Clear();
+                validHexes.Add(mousePosHex);
+
+                return validHexes;
+            }
 
             //Debug.Log($"Card of cardtype {cardType} has currently isolated {_isolatedHexes.Count} hexes.");
-
             return _isolatedHexes;
         }
 

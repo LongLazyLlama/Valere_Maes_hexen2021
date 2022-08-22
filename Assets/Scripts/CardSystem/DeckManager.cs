@@ -7,7 +7,7 @@ public class DeckManager : MonoBehaviour
     [SerializeField]
     private int _cardsInDeck = 10;
     [SerializeField]
-    private GameObject[] CardPrefabs;
+    private GameObject[] CardPrefabs = null;
     [HideInInspector]
     public static DeckManager Deck;
 

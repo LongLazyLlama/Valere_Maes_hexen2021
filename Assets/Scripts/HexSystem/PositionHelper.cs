@@ -76,6 +76,29 @@ namespace HexSystem
 
             return this;
         }
+
+        public PositionHelper<TPosition> AllHexes()
+        {
+            foreach (var position in _hexGrid.Positions.Values)
+            {
+                _hexGrid.TryGetPositionAt(position.v, position.a, position.l, out TPosition hex);
+                _validPositions.Add(hex);
+            }
+
+            return this;
+        }
+
+        public List<TPosition> TargetAllHexes()
+        {
+            foreach (var position in _hexGrid.Positions.Values)
+            {
+                _hexGrid.TryGetPositionAt(position.v, position.a, position.l, out TPosition hex);
+                _validPositions.Add(hex);
+            }
+
+            return _validPositions;
+        }
+
         //Targets any empty hex on the board at any distance.
         public PositionHelper<TPosition> AnyEmpty(params Validator[] validators)
         {

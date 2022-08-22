@@ -2,5 +2,6 @@
 {
     public interface IPosition
     {
+        void DestroyHex();
     }
 }

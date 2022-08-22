@@ -6,22 +6,8 @@ using System;
 
 namespace BoardSystem
 {
-    public class HexRemoveEventArgs<Hex, TPosition> : EventArgs
-    {
-        public TPosition FromPosition { get; }
-        public Hex HexTile { get; }
-
-        public HexRemoveEventArgs(Hex piece, TPosition position)
-        {
-            HexTile = piece;
-            FromPosition = position;
-        }
-    }
-
     public class HexGrid<TPosition>
     {
-        public event EventHandler<HexRemoveEventArgs<TPosition, TPosition>> HexRemoved;
-
         public int GridSize { get; }
 
         public BidirectionalDictionary<TPosition, (int v, int a, int l)> Positions
@@ -75,9 +61,9 @@ namespace BoardSystem
             //Debug.Log("Cube coordinate Registered at position: " + new Vector3(v, a, l));
         }
 
-        public void Remove(TPosition hex)
+        public void RemoveHex(TPosition hex)
         {
-            //Removes the hex with its position from the dictionary.
+            //Removes a random hex with its position from the dictionary.
             Positions.Remove(hex);
         }
     }

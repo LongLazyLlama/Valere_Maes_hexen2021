@@ -12,13 +12,13 @@ namespace GameSystem
     public class GameLoop : MonoBehaviour
     {
         [SerializeField]
-        private GameObject _hexPrefab;
+        private GameObject _hexPrefab = null;
         [SerializeField]
-        private GameObject _enemyPrefab;
+        private GameObject _enemyPrefab = null;
         [SerializeField]
-        private GameObject _playerPrefab;
+        private GameObject _playerPrefab = null;
         [SerializeField]
-        private CoordinateConverter _coordinateConverter;
+        private CoordinateConverter _coordinateConverter = null;
 
         public static GameLoop gameLoop;
 
@@ -27,7 +27,7 @@ namespace GameSystem
 
         [Space]
         [SerializeField]
-        private bool _spawnPlayerRandomly;
+        private bool _spawnPlayerRandomly = false;
 
         [Space]
         [SerializeField][Range(1, 50)]
