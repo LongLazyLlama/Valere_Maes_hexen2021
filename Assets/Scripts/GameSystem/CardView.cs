@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using CardSystem;
 using System;
+using StateSystem;
 
 namespace GameSystem
 {
@@ -44,7 +45,7 @@ namespace GameSystem
 
             if (CardUsed)
             {
-                DeckManager.Deck.CardUsed(_startPosition);
+                CardHand.Deck.CardUsed(_startPosition);
                 Destroy(this.gameObject);
             }
             else

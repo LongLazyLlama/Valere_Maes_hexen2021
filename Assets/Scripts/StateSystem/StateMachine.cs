@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DAE.StateSystem
+namespace StateSystem
 {
     public class StateMachine<TState>
         where TState : IState<TState>

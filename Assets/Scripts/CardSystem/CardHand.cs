@@ -1,15 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
-public class DeckManager : MonoBehaviour
+public class CardHand : MonoBehaviour
 {
     [SerializeField]
     private int _cardsInDeck = 10;
     [SerializeField]
     private GameObject[] CardPrefabs = null;
     [HideInInspector]
-    public static DeckManager Deck;
+    public static CardHand Deck;
+
+    public UnityEvent forward;
 
     public void Start() 
     {
@@ -27,5 +30,7 @@ public class DeckManager : MonoBehaviour
             Instantiate(CardPrefabs[randomValue], cardSlotPosition, Quaternion.identity, this.transform);
         }
         _cardsInDeck--;
+
+        forward?.Invoke();
     }
 }

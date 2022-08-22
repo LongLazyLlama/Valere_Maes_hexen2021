@@ -81,7 +81,7 @@ namespace HexSystem.Moves
                 //If there is a piece on a hex, remove it.
                 if (pieceTaken)
                 {
-                    if (toPiece.PlayerID == 1)
+                    if (toPiece.PlayerID == 1 || toPiece.PlayerID == 2)
                     {
                         Debug.Log("Player taken.");
                     }

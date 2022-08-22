@@ -6,6 +6,8 @@ using BoardSystem;
 using CardSystem;
 using System;
 using Random = UnityEngine.Random;
+using StateSystem;
+using GameSystem.GameStates;
 
 namespace GameSystem
 {
@@ -15,19 +17,32 @@ namespace GameSystem
         private GameObject _hexPrefab = null;
         [SerializeField]
         private GameObject _enemyPrefab = null;
-        [SerializeField]
-        private GameObject _playerPrefab = null;
-        [SerializeField]
-        private CoordinateConverter _coordinateConverter = null;
-
-        public static GameLoop gameLoop;
-
-        private Piece<Hex> _playerPiece;
-        private MoveManager<Hex> _moveManager;
 
         [Space]
         [SerializeField]
-        private bool _spawnPlayerRandomly = false;
+        private GameObject _playerOnePrefab = null;
+        [SerializeField]
+        private GameObject _playerOneHand = null;
+
+        [Space]
+        [SerializeField]
+        private GameObject _playerTwoPrefab = null;
+        [SerializeField]
+        private GameObject _playerTwoHand = null;
+
+        [SerializeField]
+        private CoordinateConverter _coordinateConverter = null;
+
+        private StateMachine<GameStateBase> _gameStateMachine;
+
+        public static GameLoop gameLoop;
+        private MoveManager<Hex> _moveManager;
+
+        private Piece<Hex> _playerPiece;
+
+        [Space]
+        [SerializeField]
+        private bool _spawnPlayersRandomly = false;
 
         [Space]
         [SerializeField][Range(1, 50)]
@@ -37,16 +52,15 @@ namespace GameSystem
         [SerializeField][Range(1, 20)]
         private int _gridSize = 3;
 
-        private Vector3 _playerPos;
+        private Vector3 _playerOnePos;
+        private Vector3 _playerTwoPos;
 
         private List<Vector3> HexGridData = new List<Vector3>();
 
         public void Start()
         {
             if (gameLoop == null)
-            {
                 gameLoop = this;
-            }
 
             var board = new Board<Piece<Hex>, Hex>();
             var grid = new HexGrid<Hex>(_gridSize);
@@ -58,10 +72,19 @@ namespace GameSystem
             GeneratePieces(grid);
 
             ConnectPiece(board, grid);
-            GetPlayerPiece(board, grid, out var playerPiece);
+            var playerOne = GetPlayerPiece(board, grid, _playerOnePos);
+            var playerTwo = GetPlayerPiece(board, grid, _playerTwoPos);
 
-            _playerPiece = playerPiece;
-            _moveManager = new MoveManager<Hex>(board, grid, _gridSize, playerPiece);
+            //All states that the game uses are registered here
+            _gameStateMachine = new StateMachine<GameStateBase>();
+            _gameStateMachine.Register(GameStateBase.FirstPlayerGameState, 
+                new FirstPlayerGameState(_gameStateMachine, board, grid, _gridSize, playerOne, _playerOneHand));
+            _gameStateMachine.Register(GameStateBase.SecondPlayerGameState, 
+                new SecondPlayerGameState(_gameStateMachine, board, grid, _gridSize, playerTwo, _playerTwoHand));
+
+            //The starting state of the game
+            _gameStateMachine.InitialState = GameStateBase.FirstPlayerGameState;
+
         }
 
         private void DeleteHexField()
@@ -102,25 +125,28 @@ namespace GameSystem
         {
             List<int> usedPositions = new List<int>();
 
-            if (_spawnPlayerRandomly)
+            if (_spawnPlayersRandomly)
             {
-                var randomPlayerPos = Random.Range(0, grid.CubeCoordinates.Count);
-                var playerpos = _coordinateConverter.CubeCoordinatesToCartesian
-                        (grid.CubeCoordinates[randomPlayerPos], _hexSize);
-
-                Instantiate(_playerPrefab, playerpos, Quaternion.identity);
-                _playerPos = playerpos;
-
-                usedPositions.Add(randomPlayerPos);
+                SpawnPlayer(grid, usedPositions, _playerOnePrefab, out var posOne);
+                _playerOnePos = posOne;
+                SpawnPlayer(grid, usedPositions, _playerTwoPrefab, out var posTwo);
+                _playerTwoPos = posTwo;
             }
             else
             {
-                int playerpos = grid.CubeCoordinates.IndexOf(new Vector3(0, 0, 0));
+                int playerOnePos = grid.CubeCoordinates.IndexOf(new Vector3(0, 0, 0));
 
-                Instantiate(_playerPrefab, Vector3.zero, Quaternion.identity);
-                _playerPos = Vector3.zero;
+                Instantiate(_playerOnePrefab, Vector3.zero, Quaternion.identity);
+                _playerOnePos = Vector3.zero;
 
-                usedPositions.Add(playerpos);
+                usedPositions.Add(playerOnePos);
+
+                int playerTwoPos = grid.CubeCoordinates.IndexOf(new Vector3(1, -1, 0));
+
+                Instantiate(_playerTwoPrefab, Vector3.zero, Quaternion.identity);
+                _playerTwoPos = new Vector3(1, -1, 0);
+
+                usedPositions.Add(playerTwoPos);
             }
 
             if (_enemyCount > grid.CubeCoordinates.Count)
@@ -141,6 +167,18 @@ namespace GameSystem
                 else
                     i--;
             }
+        }
+
+        private void SpawnPlayer(HexGrid<Hex> grid, List<int> usedPositions, GameObject playerPrefab, out Vector3 playerPosition)
+        {
+            var randomPlayerPos = Random.Range(0, grid.CubeCoordinates.Count);
+            var playerPos = _coordinateConverter.CubeCoordinatesToCartesian
+                    (grid.CubeCoordinates[randomPlayerPos], _hexSize);
+
+            Instantiate(playerPrefab, playerPos, Quaternion.identity);
+            playerPosition = playerPos;
+
+            usedPositions.Add(randomPlayerPos);
         }
 
         private void ConnectHex(HexGrid<Hex> grid, Vector3 cubeCoordinate, Hex hex)
@@ -169,20 +207,20 @@ namespace GameSystem
             }
         }
 
-        private void GetPlayerPiece(Board<Piece<Hex>, Hex> board, HexGrid<Hex> grid, out Piece<Hex> playerPiece)
+        private Piece<Hex> GetPlayerPiece(Board<Piece<Hex>, Hex> board, HexGrid<Hex> grid, Vector3 playerPos)
         {
-            var playerCubePos = _coordinateConverter.CartesianCoordinatesToCube(_playerPos, _hexSize);
+            var playerCubePos = _coordinateConverter.CartesianCoordinatesToCube(playerPos, _hexSize);
 
             if (grid.TryGetPositionAt(playerCubePos.v, playerCubePos.a, playerCubePos.l, out Hex hex))
             {
                 board.TryGetPiece(hex, out var piece);
-                playerPiece = piece;
+                return piece;
 
                 //Debug.Log($"Selected piece player ID: {piece.PlayerID} on worldposition {_playerPos} and cubecoordinate {playerCubePos}");
             }
             else
             {
-                playerPiece = null;
+                return null;
             }
         }
 
@@ -194,43 +232,17 @@ namespace GameSystem
         }
 
         public void SelectValidPositions(CardType cardType)
-            => SelectValidPositions(_playerPiece, cardType);
+            => _gameStateMachine.CurrentState.SelectValidPositions(cardType);
         public void DeselectValidPositions(CardType cardType)
-            => DeselectValidPositions(_playerPiece, cardType);
+            => _gameStateMachine.CurrentState.DeselectValidPositions(cardType);
         public void SelectIsolated(CardType cardType, Hex hex)
-            => SelectIsolated(_playerPiece, cardType, hex);
-        public void ExecuteCard(CardType cardType, Hex hex)
-            => _moveManager.ExecuteCard(_playerPiece, hex, cardType);
-
-        private void SelectValidPositions(Piece<Hex> piece, CardType cardtype)
-        {
-            var hexes = _moveManager.ValidPositionsFor(piece, cardtype);
-            foreach (var hex in hexes)
-                hex.Highlight = true;
-        }
-        private void DeselectValidPositions(Piece<Hex> piece, CardType cardtype)
-        {
-            var hexes = _moveManager.ValidPositionsFor(piece, cardtype);
-            foreach (var hex in hexes)
-                hex.Highlight = false;
-        }
-
-        private void SelectIsolated(Piece<Hex> piece, CardType cardtype, Hex hex)
-        {
-            //Reselect all isolated tiles.
-            var hexes = _moveManager.IsolatedPositionsFor(piece, cardtype, hex);
-            foreach (var h in hexes)
-                if (h != null)
-                    h.Highlight = true;
-        }
+            => _gameStateMachine.CurrentState.SelectIsolated(cardType, hex);
         public void DeselectIsolated()
-        {
-            //Reselect all isolated tiles.
-            var hexes = _moveManager._isolatedHexes;
-            if (hexes != null)
-                foreach (var h in hexes)
-                    if (h != null)
-                        h.Highlight = false;
-        }
+            => _gameStateMachine.CurrentState.DeselectIsolated();
+        public void ExecuteCard(CardType cardType, Hex hex)
+            => _gameStateMachine.CurrentState.ExecuteCard(cardType, hex);
+
+        public void Forward()
+            => _gameStateMachine.CurrentState.Forward();
     }
 }
