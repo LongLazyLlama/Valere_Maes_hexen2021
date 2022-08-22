@@ -79,15 +79,6 @@ namespace BoardSystem
         {
             //Removes the hex with its position from the dictionary.
             Positions.Remove(hex);
-            
-            OnHexRemoved(new HexRemoveEventArgs<TPosition, TPosition>(hex, hex));
         }
-
-        protected virtual void OnHexRemoved(HexRemoveEventArgs<TPosition, TPosition> eventArgs)
-        {
-            var handler = HexRemoved;
-            handler?.Invoke(this, eventArgs);
-        }
-
     }
 }

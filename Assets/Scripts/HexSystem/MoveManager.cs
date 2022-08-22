@@ -80,13 +80,6 @@ namespace HexSystem
                         .NorthWest(1)
                         .CollectValidPositions()));
 
-            _moves.Add(CardType.Bomb,
-                new ConfigurableMove<TPosition>(board, grid, (b, h, p)
-                => new PositionHelper<TPosition>(b, h, p)
-                        .AnyEmpty()
-                        .AnyPiece()
-                        .CollectValidPositions()));
-
             //Debug.Log($"Moveset dictionary now contains {_moves.Count} movesets.");
 
             //if (_moves.TryGetValue(CardType.Swipe, out var moves))
@@ -125,11 +118,6 @@ namespace HexSystem
             {
                 (_isolatedHexes, _targetHexes) = new PositionHelper<TPosition>(_board, _hexgrid, piece)
                     .CollectIsolatedPositions(maxSteps, mousePosHex, true, false);
-            }
-            else if (cardType == CardType.Bomb)
-            {
-                _isolatedHexes = new PositionHelper<TPosition>(_board, _hexgrid, piece)
-                    .CollectIsolatedPositions(maxSteps, mousePosHex, false, true).Item1;
             }
             else
             {
